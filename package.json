@@ -1,0 +1,19 @@
+{
+  "name": "honeygaingrapher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chaos511/HoneyGainGrapher.git"
+  },
+  "author": "chaos511",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chaos511/HoneyGainGrapher/issues"
+  },
+  "homepage": "https://github.com/chaos511/HoneyGainGrapher#readme"
+}

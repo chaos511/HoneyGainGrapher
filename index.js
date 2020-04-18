@@ -78,3 +78,4 @@ function getDevices(){
 }
 
  setInterval(getDevices,config.get("pingInterval")*1000)
+ getDevices()

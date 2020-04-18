@@ -1,11 +1,12 @@
 # HoneyGainGrapher
 ## Installation
   1) Install npm and nodejs https://nodejs.org/en/
-  2) Download this repository <br> with Git `git clone https://github.com/chaos511/HoneyGainGrapher`<br>On windows download zip and extract
-  3) Install all the node dependencies with `npm install` <br> On windows double click install
-  4) Add auth token to config file see Finding Your Auth Token for details
-  5) Start The program with `node index.js` or double click start
-  6) Go to http://127.0.0.1 with any browser
+  2) Install python 3.x https://www.python.org/downloads/
+  3) Download this repository <br> with Git `git clone https://github.com/chaos511/HoneyGainGrapher`<br>On windows download zip and extract
+  4) Install all the node dependencies with `npm install` <br> On windows double click install
+  5) Add auth token to config file see Finding Your Auth Token for details
+  6) Start The program with `node index.js` or double click start
+  7) Go to http://127.0.0.1 with any browser
 ## Finding Your Auth Token
   1) Go to http://https://dashboard.honeygain.com/ and login
   2) Open Devtools (in chrome you can do this with ctrl+shift+i)

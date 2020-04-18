@@ -5,7 +5,7 @@
   3) Install all the node dependencies with `npm install` <br> On windows double click install
   4) Add auth token to config file see Finding Your Auth Token for details
   5) Start The program with `node index.js` or double click start
-  6) Goto 127.0.0.1 with any browser
+  6) Goto http://127.0.0.1 with any browser
 ## Finding Your Auth Token
   TODO
 ## Features

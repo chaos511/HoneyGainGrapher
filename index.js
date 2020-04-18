@@ -20,8 +20,22 @@ function appendLog(logStr){
             }
         }); 
 }
+function genGraph(){
+    if(debug){
+        console.log("genGraph")
+    }
+    PythonShell.run('HoneyGainDevicesDelta_plot.py', null, function (err, results) {
+      if (err) 
+        throw err;
+        if(debug){
+            console.log('results: %j', results);
+        }
+    });
+  }
 function getDevices(){
-    console.log("getDevices")
+    if(debug){
+        console.log("getDevices")
+    }
     callback = function(response) {
         let str=''
         response.on('data', function (chunk) {
@@ -49,6 +63,7 @@ function getDevices(){
                         }
                     }); 
                 }
+                genGraph()
             }else{
                 appendLog("HTTP Get Error: "+str)
             }
@@ -62,12 +77,4 @@ function getDevices(){
     });
 }
 
-// setInterval(getDevices,config.get("pingInterval")*1000)
-// getDevices()
-
-  PythonShell.run('HoneyGainDevicesDelta_plot.py', null, function (err, results) {
-    if (err) 
-      throw err;
-    // Results is an array consisting of messages collected during execution
-    console.log('results: %j', results);
-  });
+ setInterval(getDevices,config.get("pingInterval")*1000)

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/chaos511/HoneyGainGrapher#readme",
   "dependencies": {
-    "config": "^3.3.1"
+    "config": "^3.3.1",
+    "python-shell": "^1.0.8"
   }
 }

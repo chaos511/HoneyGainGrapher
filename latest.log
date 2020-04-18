@@ -1,0 +1,7 @@
+http get error:Error: connect ETIMEDOUT 199.59.242.153:443HTTP Get Error: socket hang upHTTP Get Error: {"code":401,"message":"JWT Token not found"}HTTP Get Error: {"code":401,"message":"JWT Token not found"}HTTP Get Error: {"code":401,"message":"JWT Token not found"}
+HTTP Get Error: {"code":401,"message":"JWT Token not found"}
+HTTP Get Error: {"code":401,"message":"JWT Token not found"}
+HTTP Get Error: {"code":401,"message":"JWT Token not found"}
+HTTP Get Error: {"code":401,"message":"JWT Token not found"}
+HTTP Get Error: {"type":404,"title":"No route found for \"GET /api/v1/users/devices\"","details":""}
+HTTP Get Error: {"type":404,"title":"No route found for \"GET /api/v1/v1/devices\"","details":""}

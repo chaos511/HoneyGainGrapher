@@ -1,5 +1,5 @@
 # HoneyGainGrapher
-## instalation
+## Instalation
   1) Install npm and nodejs https://nodejs.org/en/
   2) Download this repository <br> with Git `git clone https://github.com/chaos511/HoneyGainGrapher`<br>On windows download zip and extract
   3) Install all the node dependencies with `npm install` <br> On windows double click install

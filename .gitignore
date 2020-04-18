@@ -1,5 +1,5 @@
 config/local.json
 node_modules
 package-lock.json
-_pycache_
+__pycache__
 latest.log

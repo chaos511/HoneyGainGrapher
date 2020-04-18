@@ -37,7 +37,7 @@ const options = {
         'authorization': 'Bearer '+config.get("authToken")
     }
 }
-const debug=true;
+const debug=false;
 function appendLog(logStr){
     console.log(logStr);
         fs.appendFile("latest.log", logStr+"\n", function(err) {

@@ -1,4 +1,6 @@
 {
   "authToken":"<Insert Your Bearer Token>",
-  "pingInterval":30
+  "pingInterval":60,
+  "webserverPort":80,
+  "webserverHost":"127.0.0.1"
 }

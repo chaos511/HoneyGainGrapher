@@ -1,7 +1,33 @@
 const config = require('config');
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 let {PythonShell} = require('python-shell')
+var path = require('path');
+
+const server = http.createServer((req, res) => {
+    fs.readFile("HoneyGainDevicesDelta_plot.html", function(error, content) {
+        if (error) {
+            if(error.code == 'ENOENT'){
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end("Error 404: File Not Found", 'utf-8');
+            }
+            else {
+                res.writeHead(500);
+                res.end('check with the site admin for error: '+error.code+' ..\n');
+                res.end(); 
+            }
+        }
+        else {
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(content, 'utf-8');
+        }
+    });
+});
+server.listen(config.get("webserverPort"),config.get("webserverHost"), (h,p) => {
+    console.log("Server running at http://"+config.get("webserverHost")+":"+config.get("webserverPort")+"");
+});
+
 const options = {
     hostname: 'dashboard.honeygain.com',
     port: 443,
@@ -77,5 +103,6 @@ function getDevices(){
     });
 }
 
- setInterval(getDevices,config.get("pingInterval")*1000)
- getDevices()
+ //setInterval(getDevices,config.get("pingInterval")*1000)
+ //getDevices()
+ genGraph()

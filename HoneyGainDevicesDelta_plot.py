@@ -4,6 +4,7 @@ import json
 import datetime #import datetime
 import time
 import sys
+from urllib.parse import unquote
 
 f= open("data.json","r")
 json_string="["
@@ -62,7 +63,7 @@ for b in idOrder:
     go.Scatter(
         x=time1[ids.index(b)],
         y=total_traffic_delta[ids.index(b)],
-        name=manufacturer[ids.index(b)][0],
+        name=unquote(manufacturer[ids.index(b)][0]),
         visible = 'legendonly'
     )
 )

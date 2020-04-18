@@ -1,0 +1,4 @@
+{
+  "authToken":"<Insert Your Bearer Token>",
+  "pingInterval":3600,
+}

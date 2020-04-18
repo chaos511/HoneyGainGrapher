@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/chaos511/HoneyGainGrapher/issues"
   },
-  "homepage": "https://github.com/chaos511/HoneyGainGrapher#readme"
+  "homepage": "https://github.com/chaos511/HoneyGainGrapher#readme",
+  "dependencies": {
+    "config": "^3.3.1"
+  }
 }

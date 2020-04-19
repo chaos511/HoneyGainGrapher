@@ -3,3 +3,4 @@ v1.1.1 Fix uri encoding for device names
 v1.1.2 Fix graph showing UTC insted of local time
 v1.1.3 Show custom title in graph insetd of manufacturer
 v1.1.4 Fix using js if statement in python
+v1.1.5 Fix null graph names and graph not showing all device

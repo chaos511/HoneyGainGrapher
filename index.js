@@ -8,6 +8,7 @@ var pageNum=1;
 var numOfDevices=0;
 const debug=true;
 var count=0;
+var timestamp=-1;
 const server = http.createServer((req, res) => {
     fs.readFile("HoneyGainDevicesDelta_plot.html", function(error, content) {
         if (error) {
@@ -52,6 +53,7 @@ function genGraph(){
     });
   }
 function getNumOfDevices(){
+    timestamp=Math.round(Date.now() / 1000)
     devnum=-1
     var options = {
         hostname: 'dashboard.honeygain.com',
@@ -128,7 +130,7 @@ function getDevices(){
                         6:encodeURI(jsonData[device].version),
                         7:jsonData[device].stats.total_traffic,
                         8:jsonData[device].stats.total_credits,
-                        9:Math.round(Date.now() / 1000),
+                        9:timestamp,
                     };
                     fs.appendFile("data.json", JSON.stringify(deviceData)+",\n", function(err) {
                         if(err) {
@@ -164,4 +166,4 @@ function getDevices(){
 }
  setInterval(getNumOfDevices,config.get("pingInterval")*1000)
  getNumOfDevices()
-// genGraph();
+//genGraph();

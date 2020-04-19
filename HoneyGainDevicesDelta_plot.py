@@ -50,13 +50,12 @@ for b in parsed_json:
     #total_credits[ids.index(b['id'])].append(b['total_credits'])
     total_traffic_delta[ids.index(b['1'])].append((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
     all_total_traffic_delta[len(all_total_traffic_delta)-1]+=((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
-    if len(b['4'])>0:
+    if b['4']!='null':
         displayName[ids.index(b['1'])].append(b['4'])
     else:
         displayName[ids.index(b['1'])].append(b['2'])
     
     last_total_traffic[ids.index(b['1'])]=b['7']/1000000
-
 wusTrace.append(
 go.Scatter(
     x=time1[0],

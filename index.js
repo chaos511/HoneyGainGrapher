@@ -121,11 +121,11 @@ function getDevices(){
                 for(device in jsonData){
                     deviceData={
                         1:jsonData[device].id,
-                        2:encodeURIComponent(jsonData[device].manufacturer),
-                        3:encodeURIComponent(jsonData[device].model),
-                        4:encodeURIComponent(jsonData[device].title),
-                        5:encodeURIComponent(jsonData[device].platform),
-                        6:encodeURIComponent(jsonData[device].version),
+                        2:encodeURI(jsonData[device].manufacturer),
+                        3:encodeURI(jsonData[device].model),
+                        4:encodeURI(jsonData[device].title),
+                        5:encodeURI(jsonData[device].platform),
+                        6:encodeURI(jsonData[device].version),
                         7:jsonData[device].stats.total_traffic,
                         8:jsonData[device].stats.total_credits,
                         9:Math.round(Date.now() / 1000),
@@ -162,5 +162,6 @@ function getDevices(){
         }
     });
 }
- setInterval(getNumOfDevices,config.get("pingInterval")*1000)
- getNumOfDevices()
+//  setInterval(getNumOfDevices,config.get("pingInterval")*1000)
+//  getNumOfDevices()
+genGraph();

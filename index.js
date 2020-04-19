@@ -162,6 +162,6 @@ function getDevices(){
         }
     });
 }
-//  setInterval(getNumOfDevices,config.get("pingInterval")*1000)
-//  getNumOfDevices()
-genGraph();
+ setInterval(getNumOfDevices,config.get("pingInterval")*1000)
+ getNumOfDevices()
+// genGraph();

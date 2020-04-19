@@ -17,7 +17,7 @@ parsed_json = json.loads(json_string)
 list=[0]
 
 time1 =[[]]
-manufacturer=[[]]
+displayName=[[]]
 #total_credits =[[]]
 total_traffic_delta =[[]]
 all_total_traffic_delta=[]
@@ -43,14 +43,18 @@ for b in parsed_json:
         ids.append(b['1'])
         #total_credits.append([])
         total_traffic_delta.append([])
-        manufacturer.append([])
+        displayName.append([])
         last_total_traffic.append(b['7']/1000000)
         time1.append([])
     time1[ids.index(b['1'])].append(datetime_from_utc_to_local(datetime.datetime.fromtimestamp(b['9'])))#datetime.strptime(str(n['time']), '%Y-%m-%d %H:%M:%S')
     #total_credits[ids.index(b['id'])].append(b['total_credits'])
     total_traffic_delta[ids.index(b['1'])].append((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
     all_total_traffic_delta[len(all_total_traffic_delta)-1]+=((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
-    manufacturer[ids.index(b['1'])].append(b['2'])
+    if(len(b['4'].len)>0){
+        displayName[ids.index(b['1'])].append(b['4'])
+    }else{
+        displayName[ids.index(b['1'])].append(b['2'])
+    }
     last_total_traffic[ids.index(b['1'])]=b['7']/1000000
 
 wusTrace.append(
@@ -67,7 +71,7 @@ for b in idOrder:
     go.Scatter(
         x=time1[ids.index(b)],
         y=total_traffic_delta[ids.index(b)],
-        name=unquote(manufacturer[ids.index(b)][0]),
+        name=unquote(displayName[ids.index(b)][0]),
         visible = 'legendonly'
     )
 )

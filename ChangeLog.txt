@@ -1,2 +1,3 @@
 v1.1.0 Add Support For More than 10 Devices
 v1.1.1 Fix uri encoding for device names
+v1.1.2 Fix graph showing UTC insted of local time

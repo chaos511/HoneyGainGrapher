@@ -27,6 +27,10 @@ ids=[]
 idOrder=[]
 wusTrace=[]
 lastTime=0
+def datetime_from_utc_to_local(utc_datetime):
+    now_timestamp = time.time()
+    offset = datetime.datetime.fromtimestamp(now_timestamp) - datetime.datetime.utcfromtimestamp(now_timestamp)
+    return utc_datetime + offset
 
 for b in parsed_json:
     if datetime.datetime.fromtimestamp(b['9']) != lastTime:
@@ -42,7 +46,7 @@ for b in parsed_json:
         manufacturer.append([])
         last_total_traffic.append(b['7']/1000000)
         time1.append([])
-    time1[ids.index(b['1'])].append(datetime.datetime.fromtimestamp(b['9']))#datetime.strptime(str(n['time']), '%Y-%m-%d %H:%M:%S')
+    time1[ids.index(b['1'])].append(datetime_from_utc_to_local(datetime.datetime.fromtimestamp(b['9'])))#datetime.strptime(str(n['time']), '%Y-%m-%d %H:%M:%S')
     #total_credits[ids.index(b['id'])].append(b['total_credits'])
     total_traffic_delta[ids.index(b['1'])].append((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
     all_total_traffic_delta[len(all_total_traffic_delta)-1]+=((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])

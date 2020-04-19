@@ -172,12 +172,8 @@ function startLoop(){
     getNumOfDevices()
     // console.log("Loop")
 }
-// var secondsToNextHour=3600-((new Date).getMinutes()*60+(new Date).getSeconds())
 var passedIntervals=parseInt(((new Date).getMinutes()*60+(new Date).getSeconds())/config.get("pingInterval"))
 var nextIntervalTime=(passedIntervals+1)*config.get("pingInterval")
 var secondsToNextInterval=nextIntervalTime-((new Date).getMinutes()*60+(new Date).getSeconds())
-// console.log(secondsToNextInterval)
 setTimeout(startLoop,secondsToNextInterval*1000)
-//getNumOfDevices()
-// genGraph();
-//startLoop()
+getNumOfDevices()

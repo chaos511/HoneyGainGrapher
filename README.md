@@ -19,6 +19,7 @@
   Adjustable ping interval<br>
   TODO: Supports custom device titles (on honeygains website)<br>
   TODO: Run in the background as a service<br>
+  TODO: Supports Multipage Active Devices lists(more than 10 devices)
 ## Image
 ![Alt text](/Capture.PNG?raw=true )
 

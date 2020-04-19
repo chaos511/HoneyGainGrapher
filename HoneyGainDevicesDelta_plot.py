@@ -5,7 +5,6 @@ import datetime #import datetime
 import time
 import sys
 from urllib.parse import unquote
-
 f= open("data.json","r")
 json_string="["
 json_string+=f.read()
@@ -89,8 +88,7 @@ unix_two_day=2*24*60*60*1000
 unix_one_week=7*24*60*60*1000
 unix_ten_day=10*24*60*60*1000
 
-
-titlestrg1 = 'Honey Gain Devices Delta'
+titlestrg1 = sys.argv[1]
 
 layout_g1 = go.Layout(
     title=titlestrg1,

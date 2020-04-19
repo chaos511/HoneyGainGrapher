@@ -44,7 +44,10 @@ function genGraph(){
     if(debug){
         console.log("genGraph")
     }
-    PythonShell.run('HoneyGainDevicesDelta_plot.py', null, function (err, results) {
+    var options={
+        args:[config.get("graphTitle")]
+    }
+    PythonShell.run('HoneyGainDevicesDelta_plot.py', options, function (err, results) {
       if (err) 
         throw err;
         if(debug){

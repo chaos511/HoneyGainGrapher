@@ -58,6 +58,7 @@ function genGraph(){
 function getNumOfDevices(){
     timestamp=Math.round(Date.now() / 1000)
     devnum=-1
+    pageNum=1;
     var options = {
         hostname: 'dashboard.honeygain.com',
         port: 443,

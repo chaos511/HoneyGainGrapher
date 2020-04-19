@@ -5,3 +5,4 @@ v1.1.3 Show custom title in graph insetd of manufacturer
 v1.1.4 Fix using js if statement in python
 v1.1.5 Fix null graph names and graph not showing all device
 v1.2.0 Allow setting graph name in config file
+v1.3.0 Make ping interval start on the hour instead of when the program starts

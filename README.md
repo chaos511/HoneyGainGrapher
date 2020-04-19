@@ -19,7 +19,23 @@
   Adjustable ping interval<br>
   TODO: Supports custom device titles (on honeygains website)<br>
   TODO: Run in the background as a service<br>
-  TODO: Supports Multipage Active Devices lists(more than 10 devices)
+  Supports Multipage Active Devices lists(more than 10 devices)
+## Config File
+  The config file is located at config/default.json the felds in the config file are
+   
+  authToken: This is where you need to put your honeygain auth token
+
+  pingInterval: How offen to record data
+  
+  startOnTheHour: If the ping interval should start counting from on the hour example x:00:00 instead of when the program starts
+
+  graphTitle: The title to be showen above the graph on the  webpage
+
+  webserverPort: The port the webserver should sisten on
+
+  webserverHost: The ip address the webserver should sisten on
+
+
 ## Image
 ![Alt text](/Capture.PNG?raw=true )
 

@@ -1,6 +1,7 @@
 {
   "authToken":"<Insert Your Bearer Token>",
-  "pingInterval":3600,
+  "pingInterval":60,
+  "startOnTheHour":true,
   "graphTitle":"Honey Gain Devices Delta",
   "webserverPort":80,
   "webserverHost":"127.0.0.1"

@@ -4,7 +4,10 @@ const http = require('http');
 const fs = require('fs');
 let {PythonShell} = require('python-shell')
 var path = require('path');
-
+var pageNum=1;
+var numOfDevices=0;
+const debug=true;
+var count=0;
 const server = http.createServer((req, res) => {
     fs.readFile("HoneyGainDevicesDelta_plot.html", function(error, content) {
         if (error) {
@@ -28,16 +31,6 @@ server.listen(config.get("webserverPort"),config.get("webserverHost"), (h,p) => 
     console.log("Server running at http://"+config.get("webserverHost")+":"+config.get("webserverPort")+"");
 });
 
-const options = {
-    hostname: 'dashboard.honeygain.com',
-    port: 443,
-    path: '/api/v1/devices',
-    method: 'GET',
-    headers: {
-        'authorization': 'Bearer '+config.get("authToken")
-    }
-}
-const debug=false;
 function appendLog(logStr){
     console.log(logStr);
         fs.appendFile("latest.log", logStr+"\n", function(err) {
@@ -58,9 +51,63 @@ function genGraph(){
         }
     });
   }
-function getDevices(){
+function getNumOfDevices(){
+    devnum=-1
+    var options = {
+        hostname: 'dashboard.honeygain.com',
+        port: 443,
+        path: '/api/v1/users/me',
+        method: 'GET',
+        headers: {
+            'authorization': 'Bearer '+config.get("authToken")
+        }
+    }
     if(debug){
-        console.log("getDevices")
+        console.log("get Total Devices")
+        console.log("URL: "+options.path)
+    }
+    callback = function(response) {
+        let str=''
+        response.on('data', function (chunk) {
+              str += chunk;
+        });
+
+        response.on('end', function () {
+            if(response.statusCode==200){
+                var jsonData=JSON.parse(str).data;
+                numOfDevices=jsonData.total_devices;
+                if(count==0){
+                    console.log("Total Devices: "+numOfDevices)
+                }
+                getDevices()
+            }else{
+                appendLog("HTTP Get Error: "+str);
+            }
+        });
+    }
+
+  var req = https.request(options, callback).end();
+
+    req.on('error', error => {
+        appendLog("HTTP Get "+error)
+    });
+    return devnum
+}
+
+function getDevices(){
+
+    var options = {
+        hostname: 'dashboard.honeygain.com',
+        port: 443,
+        path: '/api/v1/devices'+(pageNum==1?'':'?page='+pageNum),
+        method: 'GET',
+        headers: {
+            'authorization': 'Bearer '+config.get("authToken")
+        }
+    }
+    if(debug){
+        console.log("get Devices Page: "+pageNum)
+        console.log("URL: "+options.path)
     }
     callback = function(response) {
         let str=''
@@ -89,9 +136,16 @@ function getDevices(){
                         }
                     }); 
                 }
-                genGraph()
+                
             }else{
                 appendLog("HTTP Get Error: "+str)
+            }
+            if(pageNum<numOfDevices/10){
+                console.log("Pagenum: "+pageNum)
+                pageNum++;
+                getDevices();
+            }else{
+                genGraph();
             }
         });
     }
@@ -100,9 +154,13 @@ function getDevices(){
 
     req.on('error', error => {
         appendLog("HTTP Get "+error)
+        if(pageNum<numOfDevices/10){
+            pageNum++;
+            getDevices();
+        }else{
+            genGraph();
+        }
     });
 }
-
- setInterval(getDevices,config.get("pingInterval")*1000)
- getDevices()
- //genGraph()
+ setInterval(getNumOfDevices,config.get("pingInterval")*1000)
+ getNumOfDevices()

@@ -24,6 +24,7 @@ last_total_traffic=[]
 #streaming_seconds =[[]]
 ids=[]
 idOrder=[]
+traficDeltaOrder=[]
 wusTrace=[]
 lastTime=0
 def datetime_from_utc_to_local(utc_datetime):
@@ -35,9 +36,8 @@ for b in parsed_json:
     if datetime.datetime.fromtimestamp(b['9']) != lastTime:
         lastTime=datetime.datetime.fromtimestamp(b['9']) 
         idOrder=[]
+        traficDeltaOrder=[]
         all_total_traffic_delta.append(0)
-    if b['1'] not in idOrder:
-        idOrder.append(b['1'])
     if b['1'] not in ids:
         ids.append(b['1'])
         #total_credits.append([])
@@ -45,6 +45,9 @@ for b in parsed_json:
         displayName.append([])
         last_total_traffic.append(b['7']/1000000)
         time1.append([])
+    if b['1'] not in idOrder:
+        idOrder.append(b['1'])
+        traficDeltaOrder.append((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
     time1[ids.index(b['1'])].append(datetime_from_utc_to_local(datetime.datetime.fromtimestamp(b['9'])))#datetime.strptime(str(n['time']), '%Y-%m-%d %H:%M:%S')
     #total_credits[ids.index(b['id'])].append(b['total_credits'])
     total_traffic_delta[ids.index(b['1'])].append((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
@@ -55,6 +58,7 @@ for b in parsed_json:
         displayName[ids.index(b['1'])].append(b['2'])
     
     last_total_traffic[ids.index(b['1'])]=b['7']/1000000
+    print(time1[0])
 wusTrace.append(
 go.Scatter(
     x=time1[0],
@@ -63,8 +67,8 @@ go.Scatter(
     visible = 'legendonly'
 )
 )
-
-for b in idOrder:
+Z = [x for _,x in sorted(zip(traficDeltaOrder,idOrder))]
+for b in reversed(Z):
     wusTrace.append(
     go.Scatter(
         x=time1[ids.index(b)],

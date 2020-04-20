@@ -58,7 +58,6 @@ for b in parsed_json:
         displayName[ids.index(b['1'])].append(b['2'])
     
     last_total_traffic[ids.index(b['1'])]=b['7']/1000000
-    print(time1[0])
 wusTrace.append(
 go.Scatter(
     x=time1[0],

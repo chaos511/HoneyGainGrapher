@@ -119,6 +119,6 @@ layout_g1 = go.Layout(
 
 #print ("start ploting :HoneyGainDevicesDelta_plot")
 fig_g1 = go.Figure(data=data[0], layout=layout_g1)
-plotly.offline.plot(fig_g1, filename = 'HoneyGainDevicesDelta_plot.html', auto_open=False)
+plotly.offline.plot(fig_g1, filename = 'www/HoneyGainDevicesDelta_plot.html', auto_open=False)
 #print ("done ploting :HoneyGainDevicesDelta_plot")
 

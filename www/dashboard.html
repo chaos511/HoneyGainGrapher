@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="header">
+    <div class="spacer1"></div>
+    <button class="pagebutton" type="button" >
+        <div class="menu">
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                <path d="M3 18h18v-2H3v2z"></path>
+                <path d="M3 13h18v-2H3v2z"></path>
+                <path d="M3 6v2h18V6H3z"></path>
+            </svg>
+        </div>
+    </button>
+    <h1 class="pagelable">Overview</h1>
+</div>
+
+<div class="card" id="balanceCard">
+    <div class="cardLabel">Current Balance</div>
+</div>
+</body>
+</html>
+
+<script>
+    const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
+    socket.addEventListener('error', function (event) {
+        alert("Websocet Error")
+        console.log(event)
+    });
+    socket.addEventListener('open', function (event) {
+        socket.send('{"action":"getbalance"}');
+    });
+    socket.addEventListener('message', function (event) {
+        console.log('message: ', event.data);
+    });
+</script>

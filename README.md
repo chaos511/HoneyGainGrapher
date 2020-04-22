@@ -19,8 +19,12 @@
   Adjustable ping interval<br>
   Supports custom device titles (on honeygains website)<br>
   Supports Multipage Active Devices lists(more than 10 devices)<br>
-  TODO: Run in the background as a service<br>
-  TODO: Add a dashboard With total earnings<br>
+  Dashboard with earning stats and estomated next payout<br>
+  TODO: Drops sample points when data is older than x days to save space<br>
+  TODO: Runs in the background as a service<br>
+  TODO: Supports HTTP basic auth for password protection<br>
+  TODO: Pool mode where multiple devices can summed into a user<br>
+
 ## Config File
   The config file is located at config/default.json the felds in the config file are
    

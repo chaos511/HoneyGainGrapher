@@ -43,12 +43,25 @@ body{
     margin: auto;
     border: 3px solid wheat;
 }
-
+#last7Card{
+    left: 350px;
+}
+#payoutCard{
+    left: 700px;
+}
 .cardLabel {
     font-size: 120%;
 	width: 236px;
 	line-height: 5px;
 	padding: 32px;  
     background-color:#097479;
+    color: white;
+}
+.innerCardLabel1{
+    font-size: 180%;
+    color: white;
+}
+.innerCardText1{
+    font-size: 300%;
     color: white;
 }

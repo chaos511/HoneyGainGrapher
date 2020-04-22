@@ -13,7 +13,7 @@ var timestamp=-1;
 
 const server = http.createServer((req, res) => {
     var ip = req.headers['x-forwarded-for'] ||      req.connection.remoteAddress ||      req.socket.remoteAddress ||     (req.connection.socket ? req.connection.socket.remoteAddress : null);
-    appendLog("http req: "+req.url+"From Ip address: "+ip)
+    appendLog("http req: "+req.url+" From Ip address: "+ip)
     var filePath = './www' + decodeURI(req.url);
     if(filePath.includes("dashboard")&&!getConfig("enableDashboard")){
         filePath="./www/"
@@ -81,7 +81,6 @@ wsServer.on('request', function(request) {
             }
             var jsonMessage=JSON.parse(message.utf8Data)
             if(jsonMessage.action!=undefined){
-
                 switch(jsonMessage.action){
                     case "getbalance":
                         var x = await sendRequest("/api/v1/users/balances");
@@ -95,7 +94,7 @@ wsServer.on('request', function(request) {
                                 }
                             }
                             else {
-                                connection.sendUTF(content);
+                                connection.sendUTF("{\"dataFile\":["+content.slice(0,-2)+"]}");
                             }
                         });
                     break;

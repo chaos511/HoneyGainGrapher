@@ -20,20 +20,94 @@
 
 <div class="card" id="balanceCard">
     <div class="cardLabel">Current Balance</div>
+    <div class="innerCardText1" id="currentBalanceUSD"> Loading...</div>
+    <div class="innerCardLabel1"> USD</div>
+    <div class="innerCardText1" id="currentBalance"> Loading...</div>
+    <div class="innerCardLabel1"> Credits</div>
+    <div class="innerCardText1" id="currentBalanceGB"> Loading...</div>
+    <div class="innerCardLabel1"> GB</div>
+</div>
+<div class="card" id="last7Card">
+    <div class="cardLabel">Last 7 Days</div>
+    <div class="innerCardText1" id="last7BalanceUSD"> Loading...</div>
+    <div class="innerCardLabel1"> USD</div>
+    <div class="innerCardText1" id="last7Balance"> Loading...</div>
+    <div class="innerCardLabel1"> Credits</div>
+    <div class="innerCardText1" id="last7BalanceGB"> Loading...</div>
+    <div class="innerCardLabel1"> GB</div>
+    <div class="innerCardText1" id="last7Rate"> Loading...</div>
+    <div class="innerCardLabel1"> USD per Day</div>
+</div>
+<div class="card" id="payoutCard">
+    <div class="cardLabel">Payout</div>
+    <div class="innerCardLabel1"> Last Payout:</div>
+    <div class="innerCardText1" id="lastPayout"> N/A</div>
+    <div class="innerCardLabel1"> Est. bal>20: </div>
+    <div class="innerCardText1" id="nextPayout"> Loading...</div>
+    <div class="innerCardLabel1"> Days </div>
+
 </div>
 </body>
 </html>
 
 <script>
     const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
+    var last7Total=0
+    var balUSD
     socket.addEventListener('error', function (event) {
         alert("Websocet Error")
         console.log(event)
     });
     socket.addEventListener('open', function (event) {
         socket.send('{"action":"getbalance"}');
+        socket.send('{"action":"getdata"}');
     });
     socket.addEventListener('message', function (event) {
-        console.log('message: ', event.data);
+        jsondata=JSON.parse(event.data)
+        if(jsondata.data!=undefined){
+             if(jsondata.data.payout!=undefined&&jsondata.data.payout.credits!=undefined){
+                currentBalance.innerText=jsondata.data.payout.credits
+                currentBalanceGB.innerText=(jsondata.data.payout.credits/100).toFixed(2)
+             }
+             if(jsondata.data.payout!=undefined&&jsondata.data.payout.usd_cents!=undefined){
+                currentBalanceUSD.innerText=jsondata.data.payout.usd_cents/100
+                balUSD=jsondata.data.payout.usd_cents/100
+                calcNextPayout()
+             }
+
+        }
+        if(jsondata.dataFile!=undefined){
+            var sevenday=7*24*60*60
+            var timeNow=(new Date()).getTime()/1000
+            var last7initial={}
+            var last7final={}
+            for (x in jsondata.dataFile){
+                date=jsondata.dataFile[x]['9']
+                id=jsondata.dataFile[x]['1']
+                credits=jsondata.dataFile[x]['8']
+                if(timeNow-date<sevenday){
+                    if(last7initial[id]==undefined){
+                        last7initial[id]=credits
+                    }
+                    last7final[id]=credits
+                }
+            }
+            for (x in last7initial){
+                console.log(last7final[x]+" --- "+last7initial[x])
+                last7Total+=last7final[x]-last7initial[x]
+                last7Balance.innerText      =last7Total.toFixed(2)
+                last7BalanceUSD.innerText   =(last7Total/1000).toFixed(2)
+                last7BalanceGB.innerText    =(last7Total/100).toFixed(2)
+                last7Rate.innerText         =((last7Total/1000)/7).toFixed(2)
+                calcNextPayout()
+            }
+        }
+        console.log('message: ', jsondata);
     });
+
+    function calcNextPayout(){
+        if(balUSD>0&&last7Total>0){
+            nextPayout.innerText=((7/(last7Total/1000))*(20-balUSD)).toFixed(2)
+        }
+    }
 </script>

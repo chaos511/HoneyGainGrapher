@@ -148,8 +148,8 @@
                 last7BalanceUSD.innerText   =(last7Total/1000).toFixed(2)
                 last7BalanceGB.innerText    =(last7Total/100).toFixed(2)
                 last7Rate.innerText         =((last7Total/1000)/7).toFixed(2)
-                calcNextPayout()
             }
+            calcNextPayout()
         }
         if(jsondata.echo=="deviceoverview"){
             var deviceOverviewInitial=jsondata.balance
@@ -251,7 +251,6 @@
     }
     function onDateChange(sdate){
         socket.send('{"action":"getdevicebalance","time":'+(new Date(sdate)).getTime()/1000+',"echo":"deviceoverview"}');
-        // console.log("change")
         activeDevices.innerText="Loaging..."
         earningDevices.innerText="Loaging..."
     }

@@ -33,25 +33,47 @@
 body{
     background-color: black;
 }
-.card{
+.card1{
     background-color: #303030;
     position: absolute;
-    background-position-x: left;
     top:  75px;
     width: 300px;
     height: 500px;
     margin: auto;
     border: 3px solid wheat;
+    left: 20px;
 }
-#last7Card{
-    left: 350px;
+.card2{
+    background-color: #303030;
+    position: absolute;
+    top:  75px;
+    width: 300px;
+    height: 500px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 340px;
 }
-#payoutCard{
-    left: 700px;
+.card3{
+    background-color: #303030;
+    position: absolute;
+    top:  75px;
+    width: 300px;
+    height: 500px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 660px;
 }
 .cardLabel {
     font-size: 120%;
 	width: 236px;
+	line-height: 5px;
+	padding: 32px;  
+    background-color:#097479;
+    color: white;
+}
+.cardLabel2{
+    font-size: 120%;
+	width: 736px;
 	line-height: 5px;
 	padding: 32px;  
     background-color:#097479;
@@ -65,6 +87,13 @@ body{
     font-size: 300%;
     color: white;
 }
+#deviceStuffCard{
+    /* top:  595px; */
+    width: 800px;
+    height: auto;
+    /* left: 20px; */
+}
+
 .menuSidebar{
     position: absolute;
     top: 64px;
@@ -80,6 +109,10 @@ body{
     color: white;
     border: 3px solid aqua;
 }
+.menuItem:hover{
+    background-color: #656565;
+}
+
 #loadingGif{
     position: absolute;
     top: 150px;
@@ -90,3 +123,22 @@ body{
     top: 75px;
     background-color: white;
 }
+.innerCardText2{
+    color: white;
+}
+#deviceoverviewTable{
+    color: white;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  td, th {
+    border: 1px solid white;
+    text-align: left;
+    padding: 8px;
+  }
+  tr:nth-child(even) {
+    background-color: #454545;
+  }

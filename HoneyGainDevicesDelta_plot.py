@@ -13,6 +13,11 @@ json_string+="]"
 json_string=json_string.replace('\'','"')
 parsed_json = json.loads(json_string)
 
+f= open("idmap.json","r")
+json_string=f.read()
+json_string=json_string.replace('\'','"')
+idmap_json = json.loads(json_string)
+
 list=[0]
 
 time1 =[[]]
@@ -41,7 +46,6 @@ for b in parsed_json:
     if b['1'] not in ids:
         ids.append(b['1'])
         total_traffic_delta.append([])
-        displayName.append([])
         last_total_traffic.append(b['7']/1000000)
         time1.append([])
     if b['1'] not in idOrder:
@@ -50,10 +54,6 @@ for b in parsed_json:
     time1[ids.index(b['1'])].append(datetime_from_utc_to_local(datetime.datetime.fromtimestamp(b['9'])))#datetime.strptime(str(n['time']), '%Y-%m-%d %H:%M:%S')
     total_traffic_delta[ids.index(b['1'])].append((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
     all_total_traffic_delta[len(all_total_traffic_delta)-1]+=((b['7']/1000000)-last_total_traffic[ids.index(b['1'])])
-    if b['4']!='null':
-        displayName[ids.index(b['1'])].append(b['4'])
-    else:
-        displayName[ids.index(b['1'])].append(b['2'])
     
     last_total_traffic[ids.index(b['1'])]=b['7']/1000000
 wusTrace.append(
@@ -71,7 +71,7 @@ for b in reversed(Z):
     go.Scatter(
         x=time1[ids.index(b)],
         y=total_traffic_delta[ids.index(b)],
-        name=unquote(displayName[ids.index(b)][0]),
+        name=unquote(idmap_json[b]['title']),
         visible = 'legendonly'
     )
 )

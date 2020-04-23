@@ -87,44 +87,41 @@ wsServer.on('request', function(request) {
                         connection.sendUTF(x)
                     break;
                     case "getdevicebalance":
-                        fs.readFile("data.json", function(error, content) {
-                            if (error) {
-                                if(error.code == 'ENOENT'){
-                                    connection.sendUTF("Error 404: File "+filePath+" Not Found");
+                        content=await wsReadFile("data.json")
+                        jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                        var timeNow=(new Date()).getTime()/1000
+                        var retbal={}
+                        for (x in jsondata.dataFile){
+                            date=jsondata.dataFile[x]['9']
+                            id=jsondata.dataFile[x]['1']
+                            credits=jsondata.dataFile[x]['8']
+                            if(jsonMessage.time!="now"&&date>jsonMessage.time){
+                                if(retbal[id]==undefined){
+                                    retbal[id]=credits
                                 }
                             }
-                            else {
-                                jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
-                                var timeNow=(new Date()).getTime()/1000
-                                var retbal={}
-                                for (x in jsondata.dataFile){
-                                    date=jsondata.dataFile[x]['9']
-                                    id=jsondata.dataFile[x]['1']
-                                    credits=jsondata.dataFile[x]['8']
-                                    if(jsonMessage.time!="now"&&timeNow>jsonMessage.time){
-                                        if(retbal[id]==undefined){
-                                            retbal[id]=credits
-                                        }
-                                    }
-                                    if(jsonMessage.time=="now"){
-                                        retbal[id]=credits
-                                    }
-                                }
-                                connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"date":"'+jsonMessage.time+'","echo":"'+jsonMessage.echo+'"}');
+                            if(jsonMessage.time=="now"){
+                                retbal[id]=credits
                             }
-                        });
+                        }
+                        connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"time":"'+jsonMessage.time+'","echo":"'+jsonMessage.echo+'"}');
+                    break;
+                    case "getstarttime":
+                        content=await wsReadFile("data.json")
+                        jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                        var retTime=(new Date()).getTime()/1000
+                        for (x in jsondata.dataFile){
+                            retTime=Math.min(retTime,jsondata.dataFile[x]['9'])                                    
+                        }
+                        connection.sendUTF('{"time":"'+retTime+'","echo":"'+jsonMessage.echo+'"}');
                     break;
                     case "getdata":
-                        fs.readFile("data.json", function(error, content) {
-                            if (error) {
-                                if(error.code == 'ENOENT'){
-                                    connection.sendUTF("Error 404: File "+filePath+" Not Found");
-                                }
-                            }
-                            else {
-                                connection.sendUTF('{"dataFile":['+content.slice(0,-2)+'],"echo":"'+jsonMessage.echo+'"}');
-                            }
-                        });
+                        content=await wsReadFile("data.json")
+                        connection.sendUTF('{"dataFile":['+content.slice(0,-2)+'],"echo":"'+jsonMessage.echo+'"}');
+                    break;
+                    case "getidmap":
+                        content=await wsReadFile("idmap.json")
+                        connection.sendUTF('{"idmap":'+content+',"echo":"'+jsonMessage.echo+'"}');
                     break;
                 }
             }
@@ -135,6 +132,37 @@ wsServer.on('request', function(request) {
     });
 });
 
+function wsReadFile(fpath){
+    return new Promise(resolve => {
+        fs.readFile(fpath, function(error, content) {
+            if (error) {
+                if(error.code == 'ENOENT'){
+                    connection.sendUTF("Error 404: File "+fpath+" Not Found");
+                    appendLog("Error 404: File "+fpath+" Not Found")
+                }
+                resolve(undefined)
+            }
+            else {
+                resolve(content)
+            }
+        });
+    })
+}
+function ReadFile(fpath,onfail){
+    return new Promise(resolve => {
+        fs.readFile(fpath, function(error, content) {
+            if (error) {
+                if(error.code == 'ENOENT'){
+                    appendLog("Error 404: File "+fpath+" Not Found")
+                }
+                resolve(onfail)
+            }
+            else {
+                resolve(content)
+            }
+        });
+    })
+}
 function appendLog(logStr){
     console.log(logStr);
         fs.appendFile("latest.log", logStr+"\n", function(err) {
@@ -211,14 +239,38 @@ async function getNumOfDevices(){
 async function getDevices(){
     var x=await sendRequest('/api/v1/devices'+(pageNum==1?'':'?page='+pageNum))
     var jsonData=JSON.parse(x).data
+    var idmap
+    try{
+        idmap=JSON.parse(await ReadFile("idmap.json","{}"))
+    }catch{
+
+    }
+    if(idmap==undefined){
+        idmap={}
+        appendLog("idmap.json could not be parsed")
+    }
     for(device in jsonData){
+        if(idmap[jsonData[device].id]==undefined||idmap[jsonData[device].id].title!=encodeURI(jsonData[device].title)){
+            idmapData={
+                id:jsonData[device].id,
+                manufacturer:encodeURI(jsonData[device].manufacturer),
+                model:encodeURI(jsonData[device].model),
+                title:encodeURI(jsonData[device].title),
+                platform:encodeURI(jsonData[device].platform),
+                version:encodeURI(jsonData[device].version),
+            }
+            if(debug){
+                appendLog("device not found or changed adding: "+JSON.stringify(idmapData))
+            }
+            idmap[jsonData[device].id]=idmapData
+        }
         deviceData={
             1:jsonData[device].id,
-            2:encodeURI(jsonData[device].manufacturer),
-            3:encodeURI(jsonData[device].model),
-            4:encodeURI(jsonData[device].title),
-            5:encodeURI(jsonData[device].platform),
-            6:encodeURI(jsonData[device].version),
+            // 2:encodeURI(jsonData[device].manufacturer),
+            // 3:encodeURI(jsonData[device].model),
+            // 4:encodeURI(jsonData[device].title),
+            // 5:encodeURI(jsonData[device].platform),
+            // 6:encodeURI(jsonData[device].version),
             7:jsonData[device].stats.total_traffic,
             8:jsonData[device].stats.total_credits,
             9:timestamp,
@@ -229,6 +281,11 @@ async function getDevices(){
             }
         }); 
     }
+    fs.writeFile("idmap.json", JSON.stringify(idmap), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+    }); 
     if(pageNum<numOfDevices/10){
         console.log("Pagenum: "+pageNum)
         pageNum++;

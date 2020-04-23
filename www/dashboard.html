@@ -20,7 +20,7 @@
 </div>
 
 <div class="page" id="overviewPage">
-    <div class="card" id="balanceCard">
+    <div class="card1" id="balanceCard">
         <div class="cardLabel">Current Balance</div>
         <div class="innerCardText1" id="currentBalanceUSD"> Loading...</div>
         <div class="innerCardLabel1"> USD</div>
@@ -29,7 +29,7 @@
         <div class="innerCardText1" id="currentBalanceGB"> Loading...</div>
         <div class="innerCardLabel1"> GB</div>
     </div>
-    <div class="card" id="last7Card">
+    <div class="card2" id="last7Card">
         <div class="cardLabel">Last 7 Days</div>
         <div class="innerCardText1" id="last7BalanceUSD"> Loading...</div>
         <div class="innerCardLabel1"> USD</div>
@@ -40,7 +40,7 @@
         <div class="innerCardText1" id="last7Rate"> Loading...</div>
         <div class="innerCardLabel1"> USD per Day</div>
     </div>
-    <div class="card" id="payoutCard">
+    <div class="card3" id="payoutCard">
         <div class="cardLabel">Payout</div>
         <div class="innerCardLabel1"> Last Payout:</div>
         <div class="innerCardText1" id="lastPayout"> N/A</div>
@@ -55,8 +55,35 @@
         failed to load graph
     </object>
     <img id="loadingGif" src="loading.gif" alt="loading">
-    
 </div>
+
+<div class="page" id="devicesPage">
+    <div class="card1" id="diviceOverviewCard">
+        <div class="cardLabel">Device Overview</div>
+        <div class="innerCardLabel1">Active Devices:</div>
+        <div class="innerCardText1" id="activeDevices">Loading...</div>
+        <div class="innerCardLabel1">Earning Devices:</div>
+        <div class="innerCardText1" id="earningDevices">Loading...</div>
+        <div class="innerCardLabel1">Avg. Devices Earning:</div>
+        <div class="innerCardText1" id="earningPerDevice">Loading...</div>
+        <div class="innerCardLabel1">USD</div>
+        <label class="innerCardText2" for="startDate">Start date:</label>
+        <input type="date" id="startDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(this.value)"><br>
+        <label class="innerCardText2" for="endDate" style="visibility: hidden;">End date:</label>
+        <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" style="visibility: hidden;">
+    </div>
+    <div class="card2" id="deviceStuffCard">
+        <div class="cardLabel2">More Device Stuff</div>
+        <table  class="searchable sortable" id="deviceoverviewTable">
+            <tr>
+                <th onclick="sortTable(0,false,'Title',this)" >Title</th>
+                <th onclick="sortTable(1,true,'Credits Gained',this)" id="deviceoverviewTableCreditsGained">Credits Gained</th>
+                <th onclick="sortTable(2,true,'Total Credits',this)">Total Credits</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
 <div class="menuSidebar" id="menuSidebar">
     <div class="menuItem" onclick="document.location.href='dashboard.html#overview';closeSidebar()">Overview </div>
     <div class="menuItem" onclick="document.location.href='dashboard.html#graph';   closeSidebar()">Graph </div>
@@ -66,12 +93,25 @@
 </html>
 
 <script>
+    function unixToYYYYMMDD(unixtime){
+        var date = new Date(unixtime);
+        var dd = date.getDate();
+        var mm=date.getMonth()+1
+        if(dd<10){dd='0'+dd} 
+        if(mm<10){mm='0'+mm} 
+        return date.getFullYear()+'-'+mm+'-'+dd;
+    }
+    var idmap={}
     const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
+    var sevenday=7*24*60*60
+    startDate.max=unixToYYYYMMDD((new Date().getTime()))
+    startDate.value=unixToYYYYMMDD((new Date()).getTime()-sevenday*1000)
+    //endDate.max=today.getFullYear()+'-'+mm+'-'+dd;
     var last7Total=0
     var balUSD
     var sidebarWidth=0
     var last7initial={}
-    var last7final={}
+    var deviceBalance={}
 
     socket.addEventListener('error', function (event) {
         alert("Websocet Error")
@@ -79,7 +119,8 @@
     });
     socket.addEventListener('open', function (event) {
         socket.send('{"action":"getbalance"}');
-        var sevenday=7*24*60*60
+        socket.send('{"action":"getstarttime","echo":"starttime"}');
+        socket.send('{"action":"getidmap","echo":"idmap"}');
         socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
     });
     socket.addEventListener('message', function (event) {
@@ -94,17 +135,15 @@
                 balUSD=jsondata.data.payout.usd_cents/100
                 calcNextPayout()
              }
-
         }
         if(jsondata.echo=="sevenday"){
             last7initial=jsondata.balance
             socket.send('{"action":"getdevicebalance","time":"now","echo":"now"}');
         }
         if(jsondata.echo=="now"){
-            last7final=jsondata.balance
+            deviceBalance=jsondata.balance
             for (x in last7initial){
-                console.log(last7final[x]+" --- "+last7initial[x])
-                last7Total+=last7final[x]-last7initial[x]
+                last7Total+=deviceBalance[x]-last7initial[x]
                 last7Balance.innerText      =last7Total.toFixed(2)
                 last7BalanceUSD.innerText   =(last7Total/1000).toFixed(2)
                 last7BalanceGB.innerText    =(last7Total/100).toFixed(2)
@@ -112,12 +151,47 @@
                 calcNextPayout()
             }
         }
+        if(jsondata.echo=="deviceoverview"){
+            var deviceOverviewInitial=jsondata.balance
+            var activeDevicesNum=0
+            var earningDevicesNum=0
+            var earningsTotal=0
+            for (x in deviceOverviewInitial){
+                activeDevicesNum++
+                last7Total+=deviceBalance[x]-deviceOverviewInitial[x]
+                if(deviceBalance[x]!=deviceOverviewInitial[x]){
+                    earningsTotal+=deviceBalance[x]-deviceOverviewInitial[x]
+                    earningDevicesNum++
+                }
+                var row=deviceoverviewTable.insertRow(1)
+                var title=row.insertCell(0)
+                var creditsEarned=row.insertCell(1)
+                var totalCredits=row.insertCell(2)
+                // var lastEarningDate=row.insertCell(3)
+
+                title.innerText=idmap[x].title
+                creditsEarned.innerText=(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2)
+                totalCredits.innerText=deviceBalance[x]
+                // lastEarningDate.innerText="undefined"
+            }
+            earningPerDevice.innerText=(earningsTotal/activeDevicesNum/1000).toFixed(3)
+            activeDevices.innerText=activeDevicesNum
+            earningDevices.innerText=earningDevicesNum
+            sortTable(1,true,'Credits Gained',deviceoverviewTableCreditsGained)
+        }
+        if(jsondata.echo=="starttime"){
+            startDate.min=unixToYYYYMMDD(jsondata.time*1000)
+        }
+        if(jsondata.echo=="idmap"){
+            idmap=jsondata.idmap
+        }
         console.log('message: ', jsondata);
     });
 
     function calcNextPayout(){
         if(balUSD>0&&last7Total>0){
             nextPayout.innerText=Math.max(((7/(last7Total/1000))*(20-balUSD)).toFixed(2),0)
+            startDate.onchange()
         }
     }
     function closeSidebar(){
@@ -150,6 +224,7 @@
                 closeSidebar();
                 overviewPage.style.visibility="visible"
                 graphPage.style.visibility="hidden"
+                devicesPage.style.visibility="hidden"
                 pagelable.innerText="Overview"
             break;
             case "sidebar":
@@ -159,12 +234,14 @@
                 closeSidebar();
                 overviewPage.style.visibility="hidden"
                 graphPage.style.visibility="hidden"
+                devicesPage.style.visibility="visible"
                 pagelable.innerText="Devices"
             break;
             case "graph":
                 closeSidebar();
                 overviewPage.style.visibility="hidden"
                 graphPage.style.visibility="visible"
+                devicesPage.style.visibility="hidden"
                 pagelable.innerText="Graph"
             break;
             default:
@@ -172,5 +249,57 @@
             break;
         }
     }
+    function onDateChange(sdate){
+        socket.send('{"action":"getdevicebalance","time":'+(new Date(sdate)).getTime()/1000+',"echo":"deviceoverview"}');
+        activeDevices.innerText="Loaging..."
+        earningDevices.innerText="Loaging..."
+    }
     window.onhashchange()
+
+
+
+//most of this is from https://www.w3schools.com/howto/howto_js_sort_table.asp
+var lastElement
+var lastBaseName
+var inverSort=false
+function sortTable(sortIndex,isnumber,baseName,element) {
+    
+    try{
+        lastElement.innerText=lastBaseName
+    }catch (ignored) {}
+    if(lastElement==element){
+        inverSort=!inverSort
+    }
+    lastElement=element
+    lastBaseName=baseName
+
+    element.innerHTML=baseName+(inverSort?"\u25b2":"\u25bc")
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("deviceoverviewTable");
+    switching = true;
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[sortIndex];
+            y = rows[i + 1].getElementsByTagName("TD")[sortIndex];
+            if(isnumber){
+                if ((parseFloat(x.innerHTML) < parseFloat(y.innerHTML)&&!inverSort)||(parseFloat(x.innerHTML) > parseFloat(y.innerHTML)&&inverSort)) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }else{
+                if ((x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()&&inverSort)||(x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()&&!inverSort)) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+}
 </script>

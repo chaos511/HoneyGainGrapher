@@ -11,3 +11,4 @@ v1.4.0 Sort traces in graph by data usage at last interval
 v1.5.0 Add Dashboard 
 v1.6.0 Add graph tab to dashboard
 v1.6.1 Make dashboard default to overview tab
+v1.6.2 Fix dashboard links redirecting to absolute url

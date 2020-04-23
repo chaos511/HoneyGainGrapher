@@ -8,4 +8,5 @@ v1.2.0 Allow setting graph name in config file
 v1.3.0 Make ping interval start on the hour instead of when the program starts
 v1.3.1 Fix only pulling last page after first interval
 v1.4.0 Sort traces in graph by data usage at last interval
-v1.5.0 Add Dashboard (indev)
+v1.5.0 Add Dashboard 
+v1.6.0 Add graph tab to dashboard

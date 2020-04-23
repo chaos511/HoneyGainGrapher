@@ -65,3 +65,28 @@ body{
     font-size: 300%;
     color: white;
 }
+.menuSidebar{
+    position: absolute;
+    top: 64px;
+    width: 0px;
+    background-color: #303030;
+    height: 100%;
+    left: 0;
+    visibility: hidden;
+}
+
+.menuItem{
+    font-size: 150%;
+    color: white;
+    border: 3px solid aqua;
+}
+#loadingGif{
+    position: absolute;
+    top: 150px;
+    left: 250px;
+}
+.graph{
+    position: absolute;
+    top: 75px;
+    background-color: white;
+}

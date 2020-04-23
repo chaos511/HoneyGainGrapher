@@ -4,9 +4,10 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="header">
+<div class="header"> 
+    
     <div class="spacer1"></div>
-    <button class="pagebutton" type="button" >
+    <button class="pagebutton" type="button" onclick="openSidebar()">
         <div class="menu">
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                 <path d="M3 18h18v-2H3v2z"></path>
@@ -15,37 +16,51 @@
             </svg>
         </div>
     </button>
-    <h1 class="pagelable">Overview</h1>
+    <h1 class="pagelable" id="pagelable">Overview</h1>
 </div>
 
-<div class="card" id="balanceCard">
-    <div class="cardLabel">Current Balance</div>
-    <div class="innerCardText1" id="currentBalanceUSD"> Loading...</div>
-    <div class="innerCardLabel1"> USD</div>
-    <div class="innerCardText1" id="currentBalance"> Loading...</div>
-    <div class="innerCardLabel1"> Credits</div>
-    <div class="innerCardText1" id="currentBalanceGB"> Loading...</div>
-    <div class="innerCardLabel1"> GB</div>
+<div class="page" id="overviewPage">
+    <div class="card" id="balanceCard">
+        <div class="cardLabel">Current Balance</div>
+        <div class="innerCardText1" id="currentBalanceUSD"> Loading...</div>
+        <div class="innerCardLabel1"> USD</div>
+        <div class="innerCardText1" id="currentBalance"> Loading...</div>
+        <div class="innerCardLabel1"> Credits</div>
+        <div class="innerCardText1" id="currentBalanceGB"> Loading...</div>
+        <div class="innerCardLabel1"> GB</div>
+    </div>
+    <div class="card" id="last7Card">
+        <div class="cardLabel">Last 7 Days</div>
+        <div class="innerCardText1" id="last7BalanceUSD"> Loading...</div>
+        <div class="innerCardLabel1"> USD</div>
+        <div class="innerCardText1" id="last7Balance"> Loading...</div>
+        <div class="innerCardLabel1"> Credits</div>
+        <div class="innerCardText1" id="last7BalanceGB"> Loading...</div>
+        <div class="innerCardLabel1"> GB</div>
+        <div class="innerCardText1" id="last7Rate"> Loading...</div>
+        <div class="innerCardLabel1"> USD per Day</div>
+    </div>
+    <div class="card" id="payoutCard">
+        <div class="cardLabel">Payout</div>
+        <div class="innerCardLabel1"> Last Payout:</div>
+        <div class="innerCardText1" id="lastPayout"> N/A</div>
+        <div class="innerCardLabel1"> Est. bal>20: </div>
+        <div class="innerCardText1" id="nextPayout"> Loading...</div>
+        <div class="innerCardLabel1"> Days </div>
+    </div>
 </div>
-<div class="card" id="last7Card">
-    <div class="cardLabel">Last 7 Days</div>
-    <div class="innerCardText1" id="last7BalanceUSD"> Loading...</div>
-    <div class="innerCardLabel1"> USD</div>
-    <div class="innerCardText1" id="last7Balance"> Loading...</div>
-    <div class="innerCardLabel1"> Credits</div>
-    <div class="innerCardText1" id="last7BalanceGB"> Loading...</div>
-    <div class="innerCardLabel1"> GB</div>
-    <div class="innerCardText1" id="last7Rate"> Loading...</div>
-    <div class="innerCardLabel1"> USD per Day</div>
-</div>
-<div class="card" id="payoutCard">
-    <div class="cardLabel">Payout</div>
-    <div class="innerCardLabel1"> Last Payout:</div>
-    <div class="innerCardText1" id="lastPayout"> N/A</div>
-    <div class="innerCardLabel1"> Est. bal>20: </div>
-    <div class="innerCardText1" id="nextPayout"> Loading...</div>
-    <div class="innerCardLabel1"> Days </div>
 
+<div class="page" id="graphPage">
+    <object class="graph" onload="loadingGif.style.visibility='hidden'" width="1500" height="700" data="HoneyGainDevicesDelta_plot.html">
+        failed to load graph
+    </object>
+    <img id="loadingGif" src="loading.gif" alt="loading">
+    
+</div>
+<div class="menuSidebar" id="menuSidebar">
+    <div class="menuItem" onclick="document.location.href='http://127.0.0.1/dashboard.html#overview';closeSidebar()">Overview </div>
+    <div class="menuItem" onclick="document.location.href='http://127.0.0.1/dashboard.html#graph';   closeSidebar()">Graph </div>
+    <div class="menuItem" onclick="document.location.href='http://127.0.0.1/dashboard.html#devices'; closeSidebar()">Devices </div>
 </div>
 </body>
 </html>
@@ -54,6 +69,8 @@
     const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
     var last7Total=0
     var balUSD
+    var sidebarWidth=0
+
     socket.addEventListener('error', function (event) {
         alert("Websocet Error")
         console.log(event)
@@ -107,7 +124,57 @@
 
     function calcNextPayout(){
         if(balUSD>0&&last7Total>0){
-            nextPayout.innerText=((7/(last7Total/1000))*(20-balUSD)).toFixed(2)
+            nextPayout.innerText=Math.max(((7/(last7Total/1000))*(20-balUSD)).toFixed(2),0)
         }
     }
+    function closeSidebar(){
+        if(sidebarWidth>0){
+            sidebarWidth-=5
+            menuSidebar.style.width=sidebarWidth+"px"
+            setTimeout(closeSidebar,1)
+            let pages = document.querySelectorAll(".page");
+            for (let i = 0; i < pages.length; i++) {
+                pages[i].style.opacity = 1-(sidebarWidth/300);
+            }
+        }
+        menuSidebar.style.visibility=sidebarWidth>0?"visible":"hidden"
+    }
+    function openSidebar(){
+        if(sidebarWidth<150){
+            sidebarWidth+=5
+            menuSidebar.style.width=sidebarWidth+"px"
+            setTimeout(openSidebar,1)
+            let pages = document.querySelectorAll(".page");
+            for (let i = 0; i < pages.length; i++) {
+                pages[i].style.opacity = 1-(sidebarWidth/300);
+            }
+        }
+        menuSidebar.style.visibility=sidebarWidth>0?"visible":"hidden"
+    }
+    window.onhashchange=function(){
+        switch(document.location.hash.replace('#','')){
+            case "overview":
+                closeSidebar();
+                overviewPage.style.visibility="visible"
+                graphPage.style.visibility="hidden"
+                pagelable.innerText="Overview"
+            break;
+            case "sidebar":
+                openSidebar();
+            break;        
+            case "devices":
+                closeSidebar();
+                overviewPage.style.visibility="hidden"
+                graphPage.style.visibility="hidden"
+                pagelable.innerText="Devices"
+            break;
+            case "graph":
+                closeSidebar();
+                overviewPage.style.visibility="hidden"
+                graphPage.style.visibility="visible"
+                pagelable.innerText="Graph"
+            break;
+        }
+    }
+    window.onhashchange()
 </script>

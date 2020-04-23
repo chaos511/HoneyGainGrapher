@@ -86,6 +86,34 @@ wsServer.on('request', function(request) {
                         var x = await sendRequest("/api/v1/users/balances");
                         connection.sendUTF(x)
                     break;
+                    case "getdevicebalance":
+                        fs.readFile("data.json", function(error, content) {
+                            if (error) {
+                                if(error.code == 'ENOENT'){
+                                    connection.sendUTF("Error 404: File "+filePath+" Not Found");
+                                }
+                            }
+                            else {
+                                jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                                var timeNow=(new Date()).getTime()/1000
+                                var retbal={}
+                                for (x in jsondata.dataFile){
+                                    date=jsondata.dataFile[x]['9']
+                                    id=jsondata.dataFile[x]['1']
+                                    credits=jsondata.dataFile[x]['8']
+                                    if(jsonMessage.time!="now"&&timeNow>jsonMessage.time){
+                                        if(retbal[id]==undefined){
+                                            retbal[id]=credits
+                                        }
+                                    }
+                                    if(jsonMessage.time=="now"){
+                                        retbal[id]=credits
+                                    }
+                                }
+                                connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"date":"'+jsonMessage.time+'","echo":"'+jsonMessage.echo+'"}');
+                            }
+                        });
+                    break;
                     case "getdata":
                         fs.readFile("data.json", function(error, content) {
                             if (error) {
@@ -94,7 +122,7 @@ wsServer.on('request', function(request) {
                                 }
                             }
                             else {
-                                connection.sendUTF("{\"dataFile\":["+content.slice(0,-2)+"]}");
+                                connection.sendUTF('{"dataFile":['+content.slice(0,-2)+'],"echo":"'+jsonMessage.echo+'"}');
                             }
                         });
                     break;

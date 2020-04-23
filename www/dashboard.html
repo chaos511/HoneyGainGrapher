@@ -70,6 +70,8 @@
     var last7Total=0
     var balUSD
     var sidebarWidth=0
+    var last7initial={}
+    var last7final={}
 
     socket.addEventListener('error', function (event) {
         alert("Websocet Error")
@@ -77,7 +79,8 @@
     });
     socket.addEventListener('open', function (event) {
         socket.send('{"action":"getbalance"}');
-        socket.send('{"action":"getdata"}');
+        var sevenday=7*24*60*60
+        socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
     });
     socket.addEventListener('message', function (event) {
         jsondata=JSON.parse(event.data)
@@ -93,22 +96,12 @@
              }
 
         }
-        if(jsondata.dataFile!=undefined){
-            var sevenday=7*24*60*60
-            var timeNow=(new Date()).getTime()/1000
-            var last7initial={}
-            var last7final={}
-            for (x in jsondata.dataFile){
-                date=jsondata.dataFile[x]['9']
-                id=jsondata.dataFile[x]['1']
-                credits=jsondata.dataFile[x]['8']
-                if(timeNow-date<sevenday){
-                    if(last7initial[id]==undefined){
-                        last7initial[id]=credits
-                    }
-                    last7final[id]=credits
-                }
-            }
+        if(jsondata.echo=="sevenday"){
+            last7initial=jsondata.balance
+            socket.send('{"action":"getdevicebalance","time":"now","echo":"now"}');
+        }
+        if(jsondata.echo=="now"){
+            last7final=jsondata.balance
             for (x in last7initial){
                 console.log(last7final[x]+" --- "+last7initial[x])
                 last7Total+=last7final[x]-last7initial[x]

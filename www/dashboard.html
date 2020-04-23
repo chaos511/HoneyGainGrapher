@@ -121,7 +121,7 @@
         socket.send('{"action":"getbalance","echo":"balance"}');
         socket.send('{"action":"getstarttime","echo":"starttime"}');
         socket.send('{"action":"getidmap","echo":"idmap"}');
-        socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
+        
     });
     socket.addEventListener('message', function (event) {
         jsondata=JSON.parse(event.data)
@@ -169,7 +169,11 @@
                 var totalCredits=row.insertCell(2)
                 // var lastEarningDate=row.insertCell(3)
 
-                title.innerText=idmap[x].title
+                if(idmap[x]==undefined){
+                    title.innerText=x
+                }else{
+                    title.innerText=idmap[x].title
+                }
                 creditsEarned.innerText=(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2)
                 totalCredits.innerText=deviceBalance[x]
                 // lastEarningDate.innerText="undefined"
@@ -184,6 +188,7 @@
         }
         if(jsondata.echo=="idmap"){
             idmap=jsondata.idmap
+            socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
         }
         console.log('message: ', jsondata);
     });

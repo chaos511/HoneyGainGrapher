@@ -5,3 +5,16 @@ HTTP Get Error: {"code":401,"message":"JWT Token not found"}
 HTTP Get Error: {"code":401,"message":"JWT Token not found"}
 HTTP Get Error: {"type":404,"title":"No route found for \"GET /api/v1/users/devices\"","details":""}
 HTTP Get Error: {"type":404,"title":"No route found for \"GET /api/v1/v1/devices\"","details":""}
+http req: /dashboard.html From Ip address: 127.0.0.1
+http req: /styles.css From Ip address: 127.0.0.1
+http req: /loading.gif From Ip address: 127.0.0.1
+Thu Apr 23 2020 17:18:04 GMT-0500 (Central Daylight Time) Connection accepted.
+Received Message: {"action":"getbalance","echo":"balance"}
+sendRequest
+URL: /api/v1/users/balances
+Received Message: {"action":"getstarttime","echo":"starttime"}
+Received Message: {"action":"getidmap","echo":"idmap"}
+http req: /HoneyGainDevicesDelta_plot.html From Ip address: 127.0.0.1
+Received Message: {"action":"getdevicebalance","time":1587075484.903,"echo":"sevenday"}
+Received Message: {"action":"getdevicebalance","time":"now","echo":"now"}
+Received Message: {"action":"getdevicebalance","time":1586995200,"echo":"deviceoverview"}

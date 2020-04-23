@@ -118,21 +118,21 @@
         console.log(event)
     });
     socket.addEventListener('open', function (event) {
-        socket.send('{"action":"getbalance"}');
+        socket.send('{"action":"getbalance","echo":"balance"}');
         socket.send('{"action":"getstarttime","echo":"starttime"}');
         socket.send('{"action":"getidmap","echo":"idmap"}');
         socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
     });
     socket.addEventListener('message', function (event) {
         jsondata=JSON.parse(event.data)
-        if(jsondata.data!=undefined){
-             if(jsondata.data.payout!=undefined&&jsondata.data.payout.credits!=undefined){
-                currentBalance.innerText=jsondata.data.payout.credits
-                currentBalanceGB.innerText=(jsondata.data.payout.credits/100).toFixed(2)
+        if(jsondata.echo=="balance"){
+             if(jsondata.req.data.payout!=undefined&&jsondata.req.data.payout.credits!=undefined){
+                currentBalance.innerText=jsondata.req.data.payout.credits
+                currentBalanceGB.innerText=(jsondata.req.data.payout.credits/100).toFixed(2)
              }
-             if(jsondata.data.payout!=undefined&&jsondata.data.payout.usd_cents!=undefined){
-                currentBalanceUSD.innerText=jsondata.data.payout.usd_cents/100
-                balUSD=jsondata.data.payout.usd_cents/100
+             if(jsondata.req.data.payout!=undefined&&jsondata.req.data.payout.usd_cents!=undefined){
+                currentBalanceUSD.innerText=jsondata.req.data.payout.usd_cents/100
+                balUSD=jsondata.req.data.payout.usd_cents/100
                 calcNextPayout()
              }
         }
@@ -251,6 +251,7 @@
     }
     function onDateChange(sdate){
         socket.send('{"action":"getdevicebalance","time":'+(new Date(sdate)).getTime()/1000+',"echo":"deviceoverview"}');
+        // console.log("change")
         activeDevices.innerText="Loaging..."
         earningDevices.innerText="Loaging..."
     }

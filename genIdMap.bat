@@ -1,0 +1,2 @@
+node genidmap.js
+pause

@@ -84,7 +84,7 @@ wsServer.on('request', function(request) {
                 switch(jsonMessage.action){
                     case "getbalance":
                         var x = await sendRequest("/api/v1/users/balances");
-                        connection.sendUTF(x)
+                        connection.sendUTF('{"req":'+x+',"echo":"'+jsonMessage.echo+'"}')
                     break;
                     case "getdevicebalance":
                         content=await wsReadFile("data.json")

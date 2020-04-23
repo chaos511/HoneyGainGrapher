@@ -13,3 +13,4 @@ v1.6.0 Add graph tab to dashboard
 v1.6.1 Make dashboard default to overview tab
 v1.6.2 Fix dashboard links redirecting to absolute url
 v1.6.3 Move seven day logic to severside to save bandwith
+v1.6.4 Fx total trace sometimes not showing

@@ -301,6 +301,7 @@ function main(){
 function init(){
     setInterval(main,getConfig("pingInterval")*1000)
     getNumOfDevices()
+    getDevices()    
 }
 function getConfig(keyname){
     var value;

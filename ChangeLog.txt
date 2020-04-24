@@ -16,4 +16,5 @@ v1.6.3 Move seven day logic to severside to save bandwith
 v1.6.4 Fx total trace sometimes not showing
 v1.7.0 Add devices tab to dashboard and change how data is stored ~%50 space saved
 v1.7.1 Fix endless loop of getdevicebalance
-v1.7.1 Fix getdevicebalance being called for every device
+v1.7.2 Fix getdevicebalance being called for every device
+v1.7.3 DecodeURI the title in the device table and add export csv button

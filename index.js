@@ -79,8 +79,13 @@ wsServer.on('request', function(request) {
             if(debug){
                 appendLog('Received Message: ' +message.utf8Data);
             }
-            var jsonMessage=JSON.parse(message.utf8Data)
-            if(jsonMessage.action!=undefined){
+            var jsonMessage
+            try{
+                jsonMessage=JSON.parse(message.utf8Data)
+            }catch(ignored){
+                appendLog("Unable to parse: "+message.utf8Data)
+            }
+            if(jsonMessage!=undefined&&jsonMessage.action!=undefined){
                 switch(jsonMessage.action){
                     case "getbalance":
                         var x = await sendRequest("/api/v1/users/balances");

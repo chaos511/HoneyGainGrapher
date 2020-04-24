@@ -72,17 +72,47 @@
         <label class="innerCardText2" for="endDate" style="visibility: hidden;">End date:</label>
         <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" style="visibility: hidden;">
     </div>
-    <div class="card2" id="deviceStuffCard">
+    <div class="card4" id="deviceStuffCard">
         <div class="cardLabel2">More Device Stuff</div>
         <table  class="searchable sortable" id="deviceoverviewTable">
             <tr>
-                <th onclick="sortTable(0,false,'User',this)" >User</th>
-                <th onclick="sortTable(1,false,'Device',this)" >Device</th>
-                <th onclick="sortTable(2,true,'Credits Gained',this)" id="deviceoverviewTableCreditsGained">Credits Gained</th>
-                <th onclick="sortTable(3,true,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(deviceoverviewTable,0,false,'User',this)" >User</th>
+                <th onclick="sortTable(deviceoverviewTable,1,false,'Device',this)" >Device</th>
+                <th onclick="sortTable(deviceoverviewTable,2,true,'Credits Gained',this)">Credits Gained</th>
+                <th onclick="sortTable(deviceoverviewTable,true,'Total Credits',this)">Total Credits</th>
             </tr>
         </table>
         <button onclick="exportToCsv(deviceoverviewTable)"> Export To CSV</button>
+    </div>
+</div>
+
+<div class="page" id="usersPage">
+    <div class="card1" id="userOverviewCard">
+        <div class="cardLabel">User Overview</div>
+        <div class="innerCardLabel1">Active Users:</div>
+        <div class="innerCardText1" id="activeUsers">Loading...</div>
+        <div class="innerCardLabel1">Earning Users:</div>
+        <div class="innerCardText1" id="earningUsers">Loading...</div>
+        <div class="innerCardLabel1">Avg. User Earning:</div>
+        <div class="innerCardText1" id="earningPerUser">Loading...</div>
+        <div class="innerCardLabel1">USD</div>
+        <label class="innerCardText2" for="startDate">Start date:</label>
+        <input type="date" id="startDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(this.value)"><br>
+        <label class="innerCardText2" for="endDate" style="visibility: hidden;">End date:</label>
+        <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" style="visibility: hidden;">
+    </div>
+    <div class="card4" id="userStuffCard">
+        <div class="cardLabel2">More User Stuff</div>
+        <table  class="searchable sortable" id="useroverviewTable">
+            <tr>
+                <th onclick="sortTable(useroverviewTable,0,false,'User',this)" >User</th>
+                <th onclick="sortTable(useroverviewTable,1,true,'Devices',this)" >Devices</th>
+                <th onclick="sortTable(useroverviewTable,2,true,'Earning Devices',this)" >Earning Device</th>
+                <th onclick="sortTable(useroverviewTable,3,true,'Credits Gained',this)">Credits Gained</th>
+                <th onclick="sortTable(useroverviewTable,4,true,'Total Credits',this)">Total Credits</th>
+            </tr>
+        </table>
+        <button onclick="exportToCsv(useroverviewTable)"> Export To CSV</button>
     </div>
 </div>
 
@@ -90,11 +120,14 @@
     <div class="menuItem" onclick="document.location.href='dashboard.html#overview';closeSidebar()">Overview </div>
     <div class="menuItem" onclick="document.location.href='dashboard.html#graph';   closeSidebar()">Graph </div>
     <div class="menuItem" onclick="document.location.href='dashboard.html#devices'; closeSidebar()">Devices </div>
+    <div class="menuItem" onclick="document.location.href='dashboard.html#users'; closeSidebar()">Users </div>
+
 </div>
 </body>
 </html>
 
 <script>
+
     function unixToYYYYMMDD(unixtime){
         var date = new Date(unixtime);
         var dd = date.getDate();
@@ -104,10 +137,14 @@
         return date.getFullYear()+'-'+mm+'-'+dd;
     }
     var idmap={}
+    var userDevices={}
+    var userData={}
     const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
     var sevenday=7*24*60*60
-    startDate.max=unixToYYYYMMDD((new Date().getTime()))
-    startDate.value=unixToYYYYMMDD((new Date()).getTime()-sevenday*1000)
+    for(var x=0;x<2;x++){
+        startDate[x].max=unixToYYYYMMDD((new Date().getTime()))
+        startDate[x].value=unixToYYYYMMDD((new Date()).getTime()-sevenday*1000)
+    }
     //endDate.max=today.getFullYear()+'-'+mm+'-'+dd;
     var last7Total=0
     var balUSD
@@ -154,40 +191,92 @@
             calcNextPayout()
         }
         if(jsondata.echo=="deviceoverview"){
+            userDevices={}
+            userData={}
             var deviceOverviewInitial=jsondata.balance
             var activeDevicesNum=0
             var earningDevicesNum=0
             var earningsTotal=0
+            var len=deviceoverviewTable.rows.length-1
+            var len2=useroverviewTable.rows.length-1
+            for(var x=0;x<len;x++){
+                deviceoverviewTable.deleteRow(1);
+            }
+            console.log(deviceoverviewTable.rows.length+" -- "+len)
+            for(var x=0;x<len2;x++){
+                useroverviewTable.deleteRow(1);
+                console.log(useroverviewTable.rows.length+" -- "+len)
+            }
+            console.log(useroverviewTable.rows.length+" -- "+len2)
             for (x in deviceOverviewInitial){
+                var earningDevice=false
                 activeDevicesNum++
                 last7Total+=deviceBalance[x]-deviceOverviewInitial[x]
                 if(deviceBalance[x]!=deviceOverviewInitial[x]){
                     earningsTotal+=deviceBalance[x]-deviceOverviewInitial[x]
                     earningDevicesNum++
+                    earningDevice=true
                 }
                 var row=deviceoverviewTable.insertRow(1)
-                // var title=row.insertCell(0)
                 var user=row.insertCell(0)
                 var device=row.insertCell(1)
                 var creditsEarned=row.insertCell(2)
                 var totalCredits=row.insertCell(3)
+                var username=x
                 if(idmap[x]==undefined){
-                    user.innerText=x
+                    username=x
                 }else{
-                    user.innerText=decodeURI(idmap[x].title)
+                    username=decodeURI(idmap[x].title)
                 }
-                var tSplit=user.innerText.split('*')
+                var tSplit=username.split('*')
                 if(tSplit[0].charAt(0)=='#'&&tSplit.length==3){
-                    user.innerText=tSplit[0].substr(1)
+                    
+                    username=tSplit[0].substr(1)
                     device.innerText=tSplit[1]
+                    if(userDevices[tSplit[0].substr(1)]==undefined){
+                        userDevices[tSplit[0].substr(1)]=[]
+                        userData[username]={
+                            deviceCount:0,
+                            earningDeviceCount:0,
+                            creditsEarned:0,
+                            totalCredits:0,
+                        }
+                    }
+                    userData[tSplit[0].substr(1)].deviceCount++
+                    userData[tSplit[0].substr(1)].earningDeviceCount+=earningDevice?1:0
+                    userData[tSplit[0].substr(1)].creditsEarned=(deviceBalance[x]-deviceOverviewInitial[x])+parseFloat(userData[tSplit[0].substr(1)].creditsEarned)
+                    userData[username].totalCredits+=deviceBalance[x]
+                    userDevices[username].push({
+                        id:x,
+                        device:tSplit[1],
+                        creditsEarned:(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2),
+                        totalCredits:deviceBalance[x],
+                    })
+                }else{
+                    console.log("t")
                 }
+                user.innerText=username
                 creditsEarned.innerText=(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2)
                 totalCredits.innerText=deviceBalance[x]
             }
-            earningPerDevice.innerText=(earningsTotal/activeDevicesNum/1000).toFixed(3)
+            earningPerDevice.innerText=(earningsTotal/earningDevicesNum/1000).toFixed(3)
             activeDevices.innerText=activeDevicesNum
             earningDevices.innerText=earningDevicesNum
-            sortTable(2,true,'Credits Gained',deviceoverviewTableCreditsGained)
+            var earningUserNum=0
+            var activeUsersNum=0
+            for(x in userData){
+                activeUsersNum++
+                var row=useroverviewTable.insertRow(1)
+                row.insertCell(0).innerText=x
+                row.insertCell(1).innerText=userData[x].deviceCount
+                row.insertCell(2).innerText=userData[x].earningDeviceCount
+                earningUserNum+=userData[x].earningDeviceCount>0?1:0
+                row.insertCell(3).innerText=userData[x].creditsEarned.toFixed(2)
+                row.insertCell(4).innerText=userData[x].totalCredits.toFixed(2)
+            }
+            activeUsers.innerText=activeUsersNum
+            earningUsers.innerText=earningUserNum
+            earningPerUser.innerText=(earningsTotal/earningUserNum/1000).toFixed(3)
         }
         if(jsondata.echo=="starttime"){
             startDate.min=unixToYYYYMMDD(jsondata.time*1000)
@@ -202,7 +291,7 @@
     function calcNextPayout(){
         if(balUSD>0&&last7Total>0){
             nextPayout.innerText=Math.max(((7/(last7Total/1000))*(20-balUSD)).toFixed(2),0)
-            startDate.onchange()
+            startDate[0].onchange()
         }
     }
     function closeSidebar(){
@@ -236,6 +325,7 @@
                 overviewPage.style.visibility="visible"
                 graphPage.style.visibility="hidden"
                 devicesPage.style.visibility="hidden"
+                usersPage.style.visibility="hidden"
                 pagelable.innerText="Overview"
             break;
             case "sidebar":
@@ -246,6 +336,7 @@
                 overviewPage.style.visibility="hidden"
                 graphPage.style.visibility="hidden"
                 devicesPage.style.visibility="visible"
+                usersPage.style.visibility="hidden"
                 pagelable.innerText="Devices"
             break;
             case "graph":
@@ -253,6 +344,15 @@
                 overviewPage.style.visibility="hidden"
                 graphPage.style.visibility="visible"
                 devicesPage.style.visibility="hidden"
+                usersPage.style.visibility="hidden"
+                pagelable.innerText="Graph"
+            break;
+            case "users":
+                closeSidebar();
+                overviewPage.style.visibility="hidden"
+                graphPage.style.visibility="hidden"
+                devicesPage.style.visibility="hidden"
+                usersPage.style.visibility="visible"
                 pagelable.innerText="Graph"
             break;
             default:
@@ -261,9 +361,12 @@
         }
     }
     function onDateChange(sdate){
+        startDate[0].value=sdate
+        startDate[1].value=sdate
         socket.send('{"action":"getdevicebalance","time":'+(new Date(sdate)).getTime()/1000+',"echo":"deviceoverview"}');
         activeDevices.innerText="Loaging..."
         earningDevices.innerText="Loaging..."
+        console.log("onchange")
     }
     window.onhashchange()
 
@@ -272,7 +375,7 @@
 var lastElement
 var lastBaseName
 var inverSort=false
-function sortTable(sortIndex,isnumber,baseName,element) {   
+function sortTable(table,sortIndex,isnumber,baseName,element) {   
     try{
         lastElement.innerText=lastBaseName
     }catch (ignored) {}
@@ -284,7 +387,6 @@ function sortTable(sortIndex,isnumber,baseName,element) {
 
     element.innerHTML=baseName+(inverSort?"\u25b2":"\u25bc")
     var table, rows, switching, i, x, y, shouldSwitch;
-    table = document.getElementById("deviceoverviewTable");
     switching = true;
     while (switching) {
         switching = false;
@@ -319,7 +421,6 @@ function exportToCsv(table){
     var longest= findLongestRowLength(rows)
     var lines=[]
     var linesString;
-
     for(row of rows){
         var line=""
         for(var x=0;x<longest;x++){

@@ -63,6 +63,16 @@ body{
     border: 3px solid wheat;
     left: 660px;
 }
+.card4{
+    background-color: #303030;
+    position: absolute;
+    top:  75px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 340px;
+    width: 800px;
+    height: auto;
+}
 .cardLabel {
     font-size: 120%;
 	width: 236px;
@@ -86,12 +96,6 @@ body{
 .innerCardText1{
     font-size: 300%;
     color: white;
-}
-#deviceStuffCard{
-    /* top:  595px; */
-    width: 800px;
-    height: auto;
-    /* left: 20px; */
 }
 
 .menuSidebar{
@@ -126,13 +130,12 @@ body{
 .innerCardText2{
     color: white;
 }
-#deviceoverviewTable{
-    color: white;
-}
+
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
+    color: white;
   }
   td, th {
     border: 1px solid white;

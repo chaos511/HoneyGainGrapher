@@ -19,3 +19,4 @@ v1.7.1 Fix endless loop of getdevicebalance
 v1.7.2 Fix getdevicebalance being called for every device
 v1.7.3 DecodeURI the title in the device table and add export csv button
 v1.8.0 Add users tab to dashboard
+v1.8.1 Fix not setting min date in dete selector

@@ -279,7 +279,8 @@
             earningPerUser.innerText=(earningsTotal/earningUserNum/1000).toFixed(3)
         }
         if(jsondata.echo=="starttime"){
-            startDate.min=unixToYYYYMMDD(jsondata.time*1000)
+            startDate[0].min=unixToYYYYMMDD(jsondata.time*1000)
+            startDate[1].min=unixToYYYYMMDD(jsondata.time*1000)
         }
         if(jsondata.echo=="idmap"){
             idmap=jsondata.idmap

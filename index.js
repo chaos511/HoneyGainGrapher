@@ -106,7 +106,14 @@ wsServer.on('request', function(request) {
                                 }
                             }
                             if(jsonMessage.time=="now"){
-                                retbal[id]=credits
+                                if(retbal[id]!=undefined){
+                                    if(credits>retbal[id].credits){
+                                        // retbal[id]={"credits":credits,"lastEarning":Math.max(parseInt(date),parseInt(retbal[id].lastEarning))}
+                                        retbal[id]={"credits":credits,"lastEarning":date}
+                                    }
+                                }else{
+                                    retbal[id]={"credits":credits,"lastEarning":date}
+                                }
                             }
                         }
                         connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"time":"'+jsonMessage.time+'","echo":"'+jsonMessage.echo+'"}');

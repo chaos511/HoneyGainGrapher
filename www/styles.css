@@ -97,6 +97,9 @@ body{
     font-size: 300%;
     color: white;
 }
+.innerCardText2{
+    color: white;
+}
 
 .menuSidebar{
     position: absolute;
@@ -127,9 +130,7 @@ body{
     top: 75px;
     background-color: white;
 }
-.innerCardText2{
-    color: white;
-}
+
 
 table {
     font-family: arial, sans-serif;

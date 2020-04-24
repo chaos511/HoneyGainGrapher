@@ -60,6 +60,8 @@
 <div class="page" id="devicesPage">
     <div class="card1" id="diviceOverviewCard">
         <div class="cardLabel">Device Overview</div>
+        <div class="innerCardLabel1">HG Active Devices:</div>
+        <div class="innerCardText1" id="hgactiveDevices">Loading...</div>
         <div class="innerCardLabel1">Active Devices:</div>
         <div class="innerCardText1" id="activeDevices">Loading...</div>
         <div class="innerCardLabel1">Earning Devices:</div>
@@ -74,12 +76,21 @@
     </div>
     <div class="card4" id="deviceStuffCard">
         <div class="cardLabel2">More Device Stuff</div>
+        <label class="innerCardText2" for="deviceDisplayMode">Display Mode:</label>
+
+        <select id="deviceDisplayMode" onchange="updateTables()">
+          <option>Show All</option>
+          <option>Hide Inactive</option>
+          <option>Only Inactive</option>
+          <option>Only Earning</option>
+        </select>
         <table  class="searchable sortable" id="deviceoverviewTable">
             <tr>
                 <th onclick="sortTable(deviceoverviewTable,0,false,'User',this)" >User</th>
                 <th onclick="sortTable(deviceoverviewTable,1,false,'Device',this)" >Device</th>
-                <th onclick="sortTable(deviceoverviewTable,2,true,'Credits Gained',this)">Credits Gained</th>
-                <th onclick="sortTable(deviceoverviewTable,true,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(deviceoverviewTable,2,true,'Credits Gained',this)"  id="deviceCreditsGained">Credits Gained</th>
+                <th onclick="sortTable(deviceoverviewTable,3,true,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(deviceoverviewTable,4,true,'Last Earning<br>Hours Ago',this)">Last Earning<br>Hours Ago</th>
             </tr>
         </table>
         <button onclick="exportToCsv(deviceoverviewTable)"> Export To CSV</button>
@@ -108,7 +119,7 @@
                 <th onclick="sortTable(useroverviewTable,0,false,'User',this)" >User</th>
                 <th onclick="sortTable(useroverviewTable,1,true,'Devices',this)" >Devices</th>
                 <th onclick="sortTable(useroverviewTable,2,true,'Earning Devices',this)" >Earning Device</th>
-                <th onclick="sortTable(useroverviewTable,3,true,'Credits Gained',this)">Credits Gained</th>
+                <th onclick="sortTable(useroverviewTable,3,true,'Credits Gained',this)" id="userCreditsGained">Credits Gained</th>
                 <th onclick="sortTable(useroverviewTable,4,true,'Total Credits',this)">Total Credits</th>
             </tr>
         </table>
@@ -125,336 +136,5 @@
 </div>
 </body>
 </html>
-
-<script>
-
-    function unixToYYYYMMDD(unixtime){
-        var date = new Date(unixtime);
-        var dd = date.getDate();
-        var mm=date.getMonth()+1
-        if(dd<10){dd='0'+dd} 
-        if(mm<10){mm='0'+mm} 
-        return date.getFullYear()+'-'+mm+'-'+dd;
-    }
-    var idmap={}
-    var userDevices={}
-    var userData={}
-    const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
-    var sevenday=7*24*60*60
-    for(var x=0;x<2;x++){
-        startDate[x].max=unixToYYYYMMDD((new Date().getTime()))
-        startDate[x].value=unixToYYYYMMDD((new Date()).getTime()-sevenday*1000)
-    }
-    //endDate.max=today.getFullYear()+'-'+mm+'-'+dd;
-    var last7Total=0
-    var balUSD
-    var sidebarWidth=0
-    var last7initial={}
-    var deviceBalance={}
-
-    socket.addEventListener('error', function (event) {
-        alert("Websocet Error")
-        console.log(event)
-    });
-    socket.addEventListener('open', function (event) {
-        socket.send('{"action":"getbalance","echo":"balance"}');
-        socket.send('{"action":"getstarttime","echo":"starttime"}');
-        socket.send('{"action":"getidmap","echo":"idmap"}');
-        
-    });
-    socket.addEventListener('message', function (event) {
-        jsondata=JSON.parse(event.data)
-        if(jsondata.echo=="balance"){
-             if(jsondata.req.data.payout!=undefined&&jsondata.req.data.payout.credits!=undefined){
-                currentBalance.innerText=jsondata.req.data.payout.credits
-                currentBalanceGB.innerText=(jsondata.req.data.payout.credits/100).toFixed(2)
-             }
-             if(jsondata.req.data.payout!=undefined&&jsondata.req.data.payout.usd_cents!=undefined){
-                currentBalanceUSD.innerText=jsondata.req.data.payout.usd_cents/100
-                balUSD=jsondata.req.data.payout.usd_cents/100
-                calcNextPayout()
-             }
-        }
-        if(jsondata.echo=="sevenday"){
-            last7initial=jsondata.balance
-            socket.send('{"action":"getdevicebalance","time":"now","echo":"now"}');
-        }
-        if(jsondata.echo=="now"){
-            deviceBalance=jsondata.balance
-            for (x in last7initial){
-                last7Total+=deviceBalance[x]-last7initial[x]
-                last7Balance.innerText      =last7Total.toFixed(2)
-                last7BalanceUSD.innerText   =(last7Total/1000).toFixed(2)
-                last7BalanceGB.innerText    =(last7Total/100).toFixed(2)
-                last7Rate.innerText         =((last7Total/1000)/7).toFixed(2)
-            }
-            calcNextPayout()
-        }
-        if(jsondata.echo=="deviceoverview"){
-            userDevices={}
-            userData={}
-            var deviceOverviewInitial=jsondata.balance
-            var activeDevicesNum=0
-            var earningDevicesNum=0
-            var earningsTotal=0
-            var len=deviceoverviewTable.rows.length-1
-            var len2=useroverviewTable.rows.length-1
-            for(var x=0;x<len;x++){
-                deviceoverviewTable.deleteRow(1);
-            }
-            console.log(deviceoverviewTable.rows.length+" -- "+len)
-            for(var x=0;x<len2;x++){
-                useroverviewTable.deleteRow(1);
-                console.log(useroverviewTable.rows.length+" -- "+len)
-            }
-            console.log(useroverviewTable.rows.length+" -- "+len2)
-            for (x in deviceOverviewInitial){
-                var earningDevice=false
-                activeDevicesNum++
-                last7Total+=deviceBalance[x]-deviceOverviewInitial[x]
-                if(deviceBalance[x]!=deviceOverviewInitial[x]){
-                    earningsTotal+=deviceBalance[x]-deviceOverviewInitial[x]
-                    earningDevicesNum++
-                    earningDevice=true
-                }
-                var row=deviceoverviewTable.insertRow(1)
-                var user=row.insertCell(0)
-                var device=row.insertCell(1)
-                var creditsEarned=row.insertCell(2)
-                var totalCredits=row.insertCell(3)
-                var username=x
-                if(idmap[x]==undefined){
-                    username=x
-                }else{
-                    username=decodeURI(idmap[x].title)
-                }
-                var tSplit=username.split('*')
-                if(tSplit[0].charAt(0)=='#'&&tSplit.length==3){
-                    
-                    username=tSplit[0].substr(1)
-                    device.innerText=tSplit[1]
-                    if(userDevices[tSplit[0].substr(1)]==undefined){
-                        userDevices[tSplit[0].substr(1)]=[]
-                        userData[username]={
-                            deviceCount:0,
-                            earningDeviceCount:0,
-                            creditsEarned:0,
-                            totalCredits:0,
-                        }
-                    }
-                    userData[tSplit[0].substr(1)].deviceCount++
-                    userData[tSplit[0].substr(1)].earningDeviceCount+=earningDevice?1:0
-                    userData[tSplit[0].substr(1)].creditsEarned=(deviceBalance[x]-deviceOverviewInitial[x])+parseFloat(userData[tSplit[0].substr(1)].creditsEarned)
-                    userData[username].totalCredits+=deviceBalance[x]
-                    userDevices[username].push({
-                        id:x,
-                        device:tSplit[1],
-                        creditsEarned:(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2),
-                        totalCredits:deviceBalance[x],
-                    })
-                }else{
-                    console.log("t")
-                }
-                user.innerText=username
-                creditsEarned.innerText=(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2)
-                totalCredits.innerText=deviceBalance[x]
-            }
-            earningPerDevice.innerText=(earningsTotal/earningDevicesNum/1000).toFixed(3)
-            activeDevices.innerText=activeDevicesNum
-            earningDevices.innerText=earningDevicesNum
-            var earningUserNum=0
-            var activeUsersNum=0
-            for(x in userData){
-                activeUsersNum++
-                var row=useroverviewTable.insertRow(1)
-                row.insertCell(0).innerText=x
-                row.insertCell(1).innerText=userData[x].deviceCount
-                row.insertCell(2).innerText=userData[x].earningDeviceCount
-                earningUserNum+=userData[x].earningDeviceCount>0?1:0
-                row.insertCell(3).innerText=userData[x].creditsEarned.toFixed(2)
-                row.insertCell(4).innerText=userData[x].totalCredits.toFixed(2)
-            }
-            activeUsers.innerText=activeUsersNum
-            earningUsers.innerText=earningUserNum
-            earningPerUser.innerText=(earningsTotal/earningUserNum/1000).toFixed(3)
-        }
-        if(jsondata.echo=="starttime"){
-            startDate[0].min=unixToYYYYMMDD(jsondata.time*1000)
-            startDate[1].min=unixToYYYYMMDD(jsondata.time*1000)
-        }
-        if(jsondata.echo=="idmap"){
-            idmap=jsondata.idmap
-            socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
-        }
-        console.log('message: ', jsondata);
-    });
-
-    function calcNextPayout(){
-        if(balUSD>0&&last7Total>0){
-            nextPayout.innerText=Math.max(((7/(last7Total/1000))*(20-balUSD)).toFixed(2),0)
-            startDate[0].onchange()
-        }
-    }
-    function closeSidebar(){
-        if(sidebarWidth>0){
-            sidebarWidth-=5
-            menuSidebar.style.width=sidebarWidth+"px"
-            setTimeout(closeSidebar,1)
-            let pages = document.querySelectorAll(".page");
-            for (let i = 0; i < pages.length; i++) {
-                pages[i].style.opacity = 1-(sidebarWidth/300);
-            }
-        }
-        menuSidebar.style.visibility=sidebarWidth>0?"visible":"hidden"
-    }
-    function openSidebar(){
-        if(sidebarWidth<150){
-            sidebarWidth+=5
-            menuSidebar.style.width=sidebarWidth+"px"
-            setTimeout(openSidebar,1)
-            let pages = document.querySelectorAll(".page");
-            for (let i = 0; i < pages.length; i++) {
-                pages[i].style.opacity = 1-(sidebarWidth/300);
-            }
-        }
-        menuSidebar.style.visibility=sidebarWidth>0?"visible":"hidden"
-    }
-    window.onhashchange=function(){
-        switch(document.location.hash.replace('#','')){
-            case "overview":
-                closeSidebar();
-                overviewPage.style.visibility="visible"
-                graphPage.style.visibility="hidden"
-                devicesPage.style.visibility="hidden"
-                usersPage.style.visibility="hidden"
-                pagelable.innerText="Overview"
-            break;
-            case "sidebar":
-                openSidebar();
-            break;        
-            case "devices":
-                closeSidebar();
-                overviewPage.style.visibility="hidden"
-                graphPage.style.visibility="hidden"
-                devicesPage.style.visibility="visible"
-                usersPage.style.visibility="hidden"
-                pagelable.innerText="Devices"
-            break;
-            case "graph":
-                closeSidebar();
-                overviewPage.style.visibility="hidden"
-                graphPage.style.visibility="visible"
-                devicesPage.style.visibility="hidden"
-                usersPage.style.visibility="hidden"
-                pagelable.innerText="Graph"
-            break;
-            case "users":
-                closeSidebar();
-                overviewPage.style.visibility="hidden"
-                graphPage.style.visibility="hidden"
-                devicesPage.style.visibility="hidden"
-                usersPage.style.visibility="visible"
-                pagelable.innerText="Graph"
-            break;
-            default:
-                document.location.hash="overview"
-            break;
-        }
-    }
-    function onDateChange(sdate){
-        startDate[0].value=sdate
-        startDate[1].value=sdate
-        socket.send('{"action":"getdevicebalance","time":'+(new Date(sdate)).getTime()/1000+',"echo":"deviceoverview"}');
-        activeDevices.innerText="Loaging..."
-        earningDevices.innerText="Loaging..."
-        console.log("onchange")
-    }
-    window.onhashchange()
-
-
-
-var lastElement
-var lastBaseName
-var inverSort=false
-function sortTable(table,sortIndex,isnumber,baseName,element) {   
-    try{
-        lastElement.innerText=lastBaseName
-    }catch (ignored) {}
-    if(lastElement==element){
-        inverSort=!inverSort
-    }
-    lastElement=element
-    lastBaseName=baseName
-
-    element.innerHTML=baseName+(inverSort?"\u25b2":"\u25bc")
-    var table, rows, switching, i, x, y, shouldSwitch;
-    switching = true;
-    while (switching) {
-        switching = false;
-        rows = table.rows;
-        for (i = 1; i < (rows.length - 1); i++) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[sortIndex];
-            y = rows[i + 1].getElementsByTagName("TD")[sortIndex];
-            if(isnumber){
-                if ((parseFloat(x.innerHTML) < parseFloat(y.innerHTML)&&!inverSort)||(parseFloat(x.innerHTML) > parseFloat(y.innerHTML)&&inverSort)) {
-                    shouldSwitch = true;
-                    break;
-                }
-            }else{
-                if ((x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()&&inverSort)||(x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()&&!inverSort)) {
-                    shouldSwitch = true;
-                    break;
-                }
-            }
-        }
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-        }
-    }
-}
-
-
-
-function exportToCsv(table){
-    var rows=Array.from(table.querySelectorAll("tr"))
-    var longest= findLongestRowLength(rows)
-    var lines=[]
-    var linesString;
-    for(row of rows){
-        var line=""
-        for(var x=0;x<longest;x++){
-            if(row.children[x]!=undefined){
-                line+=parseCell(row.children[x])
-            }
-            line+=(x!=longest-1)?",":""
-        }
-        lines.push(line)
-    }
-    linesString=lines.join('\n')
-    var csvBlob=new Blob([linesString],{type:'text/csv'})
-    var blocUrl =URL.createObjectURL(csvBlob)
-    console.log(blocUrl)
-    var aElement=document.createElement('a')
-    aElement.href=blocUrl
-    aElement.download=table.id+'.csv'
-    aElement.click()
-    setTimeout(()=>{
-        URL.revokeObjectURL(blocUrl)
-    },500)
-}
-function findLongestRowLength(rows){
-    var retNum=0
-    for(x in rows){
-        retNum=Math.max(rows[x].childElementCount,retNum)
-    }
-    return retNum
-}
-function parseCell(cell){
-    var parsedValue=cell.textContent
-    parsedValue=parsedValue.replace(/"/g,'""')
-    parsedValue=/[",\n"]/.test(parsedValue)?`"${parsedValue}"`:parsedValue
-    return parsedValue
-}
-</script>
+<script src="helper.js"></script>
+<script src="main.js"></script>

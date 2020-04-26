@@ -107,40 +107,57 @@ function updateTables() {
   for (var x = 0; x < len2; x++) {
     useroverviewTable.deleteRow(1);
   }
+  var rowCount = 0;
   for (var id in deviceOverviewInitial) {
+    rowCount++;
     var earningDevice = false;
     hgactiveDevicesNum++;
-    try{  
+    try {
       last7Total += deviceBalanceEnd[id].credits - deviceOverviewInitial[id];
-    }catch(e){deviceBalanceEnd[id]={"credits":deviceOverviewInitial[id]}}
+    } catch (e) {
+      deviceBalanceEnd[id] = { credits: deviceOverviewInitial[id] };
+    }
     //device earning
     if (deviceBalanceEnd[id].credits != deviceOverviewInitial[id]) {
       earningsTotal += deviceBalanceEnd[id].credits - deviceOverviewInitial[id];
       earningDevicesNum++;
       earningDevice = true;
     }
-    var deviceRow = deviceoverviewTable.insertRow(1);
-    deviceRow.insertCell(0).innerText = username;
-    var userCell = deviceRow.insertCell(1);
-    deviceRow.insertCell(2).innerText = (
-      deviceBalanceEnd[id].credits - deviceOverviewInitial[id]
-    ).toFixed(2);
-    deviceRow.insertCell(3).innerText = deviceBalanceEnd[id].credits;
-    var lastEarningCell = deviceRow.insertCell(4);
 
     var username = id;
     if (idMap[id] != undefined) {
       username = decodeURI(idMap[id].title);
     }
+    var deviceRow = deviceoverviewTable.insertRow(rowCount);
+
+    var userCell = deviceRow.insertCell(0);
+    userCell.innerText = username;
+
+    var deviceCell = deviceRow.insertCell(1);
+
+    var creditsGainedCell = deviceRow.insertCell(2);
+    creditsGainedCell.innerText = (
+      deviceBalanceEnd[id].credits - deviceOverviewInitial[id]
+    ).toFixed(2);
+
+    var totalCreditsCell = deviceRow.insertCell(3);
+    totalCreditsCell.innerText = deviceBalanceEnd[id].credits;
+
+    var lastEarningCell = deviceRow.insertCell(4);
+
     var tSplit = username.split("*");
     var thisLastEarning = (
       (new Date().getTime() / 1000 - deviceBalance[id].lastEarning) /
       3600
     ).toFixed(1);
+    console.log(username + " --- " + rowCount);
+
     if (tSplit[0].charAt(0) == "#" && tSplit.length == 3) {
-      //folows the pool format: #<user>*<device>*
+      console.log(true);
+      //follows the pool format: #<user>*<device>*
       username = tSplit[0].substr(1);
-      userCell.innerText = tSplit[1];
+      userCell.innerText = username;
+      deviceCell.innerText = tSplit[1];
       if (userDevices[username] == undefined) {
         //create user
         userDevices[username] = [];
@@ -156,7 +173,7 @@ function updateTables() {
       userData[username].deviceCount++;
       userData[username].earningDeviceCount += earningDevice ? 1 : 0;
       userData[username].creditsEarned =
-      deviceBalanceEnd[id].credits -
+        deviceBalanceEnd[id].credits -
         deviceOverviewInitial[id] +
         parseFloat(userData[tSplit[0].substr(1)].creditsEarned);
       userData[username].totalCredits += deviceBalanceEnd[id].credits;
@@ -165,9 +182,9 @@ function updateTables() {
         //push device into user
         id: id,
         device: tSplit[1],
-        creditsEarned: (deviceBalanceEnd[id] - deviceOverviewInitial[id]).toFixed(
-          2
-        ),
+        creditsEarned: (
+          deviceBalanceEnd[id] - deviceOverviewInitial[id]
+        ).toFixed(2),
         totalCredits: deviceBalanceEnd[id],
       });
     } //end follows the pool format: #<user>*<device>*

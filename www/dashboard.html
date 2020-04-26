@@ -101,7 +101,7 @@
     <div class="card1" id="userOverviewCard">
         <div class="cardLabel">User Overview</div>
         <div class="innerCardLabel1">Active Users:</div>
-        <div class="innerCardText1" id="hgActiveUsers">Loading...</div>
+        <div class="innerCardText1" id="activeUsers">Loading...</div>
         <div class="innerCardLabel1">Earning Users:</div>
         <div class="innerCardText1" id="earningUsers">Loading...</div>
         <div class="innerCardLabel1">Avg. User Earning:</div>
@@ -119,9 +119,8 @@
                 <th onclick="sortTable(useroverviewTable,0,false,'User',this)" >User</th>
                 <th onclick="sortTable(useroverviewTable,1,true,'Devices',this)" >Devices</th>
                 <th onclick="sortTable(useroverviewTable,2,true,'Earning Devices',this)" >Earning Device</th>
-                <th onclick="sortTable(useroverviewTable,3,true,'Active Devices',this)" >Active Devices</th>
-                <th onclick="sortTable(useroverviewTable,4,true,'Credits Gained',this)" id="userCreditsGained">Credits Gained</th>
-                <th onclick="sortTable(useroverviewTable,5,true,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(useroverviewTable,3,true,'Credits Gained',this)" id="userCreditsGained">Credits Gained</th>
+                <th onclick="sortTable(useroverviewTable,4,true,'Total Credits',this)">Total Credits</th>
             </tr>
         </table>
         <button onclick="exportToCsv(useroverviewTable)"> Export To CSV</button>

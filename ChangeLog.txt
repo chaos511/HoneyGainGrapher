@@ -23,7 +23,6 @@ v1.8.1 Fix not setting min date in dete selector
 v1.8.2 Improved error handling for unparseable json messages
 v1.9.0 Add Last earning column and device filter to device table and separate html/js files
 v1.10.0 Add Last earning column to user table 
-v1.11.0 Add option to disable graph
+v1.11.0 Add option to dissable graph
 v1.11.1 Code Cleanup and Enable DeepScan
 v1.12.0 Add end date selector for both user and device tables
-v1.12.1 Code Cleanup

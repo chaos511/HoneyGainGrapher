@@ -141,7 +141,7 @@ function updateTables() {
     ).toFixed(2);
 
     var totalCreditsCell = deviceRow.insertCell(3);
-    totalCreditsCell.innerText ="$"+deviceBalanceEnd[id].credits.toFixed(2);
+    totalCreditsCell.innerText =deviceBalanceEnd[id].credits.toFixed(2);
 
     var balanceGainedCell = deviceRow.insertCell(4);
     balanceGainedCell.innerText = "$"+(

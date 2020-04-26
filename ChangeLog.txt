@@ -25,4 +25,3 @@ v1.9.0 Add Last earning column and device filter to device table and separate ht
 v1.10.0 Add Last earning column to user table 
 v1.11.0 Add option to dissable graph
 v1.11.1 Code Cleanup and Enable DeepScan
-v1.12.0 Add end date selector for both user and device tables

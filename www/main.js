@@ -4,22 +4,16 @@ var userDevices={}
 var userData={}
 const socket=new WebSocket("ws://"+document.location.host,"echo-protocol")
 var sevenday=7*24*60*60
-var oneday=1*24*60*60
 var last7Total=0
 var balUSD
 var sidebarWidth=0
 var last7initial={}
 var deviceBalance={}
 var deviceOverviewInitial
-var startDateVal
-var endDateVal
 
 for(var x=0;x<2;x++){
     startDate[x].max=unixToYYYYMMDD((new Date().getTime()))
     startDate[x].value=unixToYYYYMMDD((new Date()).getTime()-sevenday*1000)
-    endDate[x].max=unixToYYYYMMDD((new Date().getTime())+oneday*1000)
-    endDate[x].value=unixToYYYYMMDD((new Date().getTime())+oneday*1000)
-
 }
 socket.addEventListener('error', function (event) {
     alert("Websocet Error")
@@ -48,10 +42,6 @@ socket.addEventListener('message', function (event) {
         last7initial=jsondata.balance
         socket.send('{"action":"getdevicebalance","time":"now","echo":"now"}');
     }
-    if(jsondata.echo=="enddate"){
-        deviceBalance=jsondata.balance
-        socket.send('{"action":"getdevicebalance","starttime":'+(new Date(startDateVal)).getTime()/1000+',"echo":"deviceoverview"}');
-    }
     if(jsondata.echo=="now"){
         deviceBalance=jsondata.balance
         for (x in last7initial){
@@ -70,12 +60,10 @@ socket.addEventListener('message', function (event) {
     if(jsondata.echo=="starttime"){
         startDate[0].min=unixToYYYYMMDD(jsondata.time*1000)
         startDate[1].min=unixToYYYYMMDD(jsondata.time*1000)
-        endDate[0].min=unixToYYYYMMDD(jsondata.time*1000)
-        endDate[1].min=unixToYYYYMMDD(jsondata.time*1000)
     }
     if(jsondata.echo=="idmap"){
         idmap=jsondata.idmap
-        socket.send('{"action":"getdevicebalance","starttime":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
+        socket.send('{"action":"getdevicebalance","time":'+((new Date()).getTime()/1000-sevenday)+',"echo":"sevenday"}');
     }
     console.log('message: ', jsondata);
 });
@@ -93,6 +81,7 @@ function updateTables(){
     }
     for(var x=0;x<len2;x++){
         useroverviewTable.deleteRow(1);
+        console.log(useroverviewTable.rows.length+" -- "+len)
     }
     for (var id in deviceOverviewInitial){
         var earningDevice=false
@@ -106,13 +95,7 @@ function updateTables(){
             earningDevice=true
         }
         var deviceRow=deviceoverviewTable.insertRow(1)
-        deviceRow.insertCell(0).innerText=username
-        var userCell=deviceRow.insertCell(1)
-        deviceRow.insertCell(2).innerText=(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)
-        deviceRow.insertCell(3).innerText=deviceBalance[id].credits
-        var lastEarningCell=deviceRow.insertCell(4)
-
-        
+        var lastEarning=deviceRow.insertCell(4)
         var username=id
         if(idmap[id]!=undefined){
             username=decodeURI(idmap[id].title)
@@ -121,7 +104,7 @@ function updateTables(){
         var thisLastEarning=(((new Date()).getTime()/1000-deviceBalance[id].lastEarning)/3600).toFixed(1)
         if(tSplit[0].charAt(0)=='#'&&tSplit.length==3){//folows the pool format: #<user>*<device>*
             username=tSplit[0].substr(1)
-            userCell.innerText=tSplit[1]
+            deviceRow.insertCell(1).innerText=tSplit[1]
             if(userDevices[username]==undefined){//create user
                 userDevices[username]=[]
                 userData[username]={
@@ -145,8 +128,13 @@ function updateTables(){
                 totalCredits:deviceBalance[id],
             })
         }//end folows the pool format: #<user>*<device>*
-        lastEarningCell.innerText=thisLastEarning
-        lastEarningCell.style=thisLastEarning>=24?"background-color: #ff0000;":""
+
+        deviceRow.insertCell(0).innerText=username
+        deviceRow.insertCell(2).innerText=(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)
+        deviceRow.insertCell(3).innerText=deviceBalance[id].credits
+        lastEarning.innerText=thisLastEarning
+        lastEarning.style=thisLastEarning>=24?"background-color: #ff0000;":""
+
         //display mode hide not earning
         if(deviceDisplayMode.selectedIndex==3&&(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)==0){
             row.style="display:none;"
@@ -240,15 +228,10 @@ window.onhashchange=function(){
         break;
     }
 }
-
-function onDateChange(sdate,edate){
-    startDateVal=sdate
-    endDateVal=edate
-    startDate[0].value=startDateVal
-    startDate[1].value=startDateVal
-    endDate[0].value=endDateVal
-    endDate[1].value=endDateVal
-    socket.send('{"action":"getdevicebalance","endtime":'+(new Date(endDateVal)).getTime()/1000+',"echo":"enddate"}');
+function onDateChange(sdate){
+    startDate[0].value=sdate
+    startDate[1].value=sdate
+    socket.send('{"action":"getdevicebalance","time":'+(new Date(sdate)).getTime()/1000+',"echo":"deviceoverview"}');
     activeDevices.innerText="Loaging..."
     earningDevices.innerText="Loaging..."
     console.log("onchange")

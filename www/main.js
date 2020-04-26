@@ -83,103 +83,91 @@ function updateTables(){
         useroverviewTable.deleteRow(1);
         console.log(useroverviewTable.rows.length+" -- "+len)
     }
-    for (var id in deviceOverviewInitial){
+    for (x in deviceOverviewInitial){
         var earningDevice=false
         hgactiveDevicesNum++
-        last7Total+=deviceBalance[id].credits-deviceOverviewInitial[id]
-
-        //device earning
-        if(deviceBalance[id].credits!=deviceOverviewInitial[id]){
-            earningsTotal+=deviceBalance[id].credits-deviceOverviewInitial[id]
+        last7Total+=deviceBalance[x].credits-deviceOverviewInitial[x]
+        if(deviceBalance[x].credits!=deviceOverviewInitial[x]){
+            earningsTotal+=deviceBalance[x].credits-deviceOverviewInitial[x]
             earningDevicesNum++
             earningDevice=true
         }
         var row=deviceoverviewTable.insertRow(1)
-        var user=row.insertCell(0),device=row.insertCell(1),creditsEarned=row.insertCell(2),totalCredits=row.insertCell(3),lastEarning=row.insertCell(4)
-        var username=id
-        if(idmap[id]==undefined){
-            username=id
+        var user=row.insertCell(0)
+        var device=row.insertCell(1)
+        var creditsEarned=row.insertCell(2)
+        var totalCredits=row.insertCell(3)
+        var lastEarning=row.insertCell(4)
+        var username=x
+        if(idmap[x]==undefined){
+            username=x
         }else{
-            username=decodeURI(idmap[id].title)
+            username=decodeURI(idmap[x].title)
         }
         var tSplit=username.split('*')
-        var thisLastEarning=(((new Date()).getTime()/1000-deviceBalance[id].lastEarning)/3600).toFixed(1)
-        if(tSplit[0].charAt(0)=='#'&&tSplit.length==3){//folows the pool format: #<user>*<device>*
+        if(tSplit[0].charAt(0)=='#'&&tSplit.length==3){
             username=tSplit[0].substr(1)
             device.innerText=tSplit[1]
-            if(userDevices[username]==undefined){//create user
-                userDevices[username]=[]
+            if(userDevices[tSplit[0].substr(1)]==undefined){
+                userDevices[tSplit[0].substr(1)]=[]
                 userData[username]={
                     deviceCount:0,
                     earningDeviceCount:0,
-                    activeDeviceCount:0,
                     creditsEarned:0,
                     totalCredits:0,
                 }
             }
-            //update user stats
-            userData[username].deviceCount++
-            userData[username].earningDeviceCount+=earningDevice?1:0
-            userData[username].creditsEarned=(deviceBalance[id].credits-deviceOverviewInitial[id])+parseFloat(userData[tSplit[0].substr(1)].creditsEarned)
-            userData[username].totalCredits+=deviceBalance[id].credits
-            userData[username].activeDeviceCount+=thisLastEarning>=24?0:1
-            userDevices[username].push({//push device into user
-                id:id,
+            userData[tSplit[0].substr(1)].deviceCount++
+            userData[tSplit[0].substr(1)].earningDeviceCount+=earningDevice?1:0
+            userData[tSplit[0].substr(1)].creditsEarned=(deviceBalance[x].credits-deviceOverviewInitial[x])+parseFloat(userData[tSplit[0].substr(1)].creditsEarned)
+            userData[username].totalCredits+=deviceBalance[x].credits
+            userDevices[username].push({
+                id:x,
                 device:tSplit[1],
-                creditsEarned:(deviceBalance[id]-deviceOverviewInitial[id]).toFixed(2),
-                totalCredits:deviceBalance[id],
+                creditsEarned:(deviceBalance[x]-deviceOverviewInitial[x]).toFixed(2),
+                totalCredits:deviceBalance[x],
             })
-        }//end folows the pool format: #<user>*<device>*
-
+        }
         user.innerText=username
-        creditsEarned.innerText=(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)
-        totalCredits.innerText=deviceBalance[id].credits
-        lastEarning.innerText=thisLastEarning
-        lastEarning.style=thisLastEarning>=24?"background-color: #ff0000;":""
-
-        //display mode hide not earning
-        if(deviceDisplayMode.selectedIndex==3&&(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)==0){
+        creditsEarned.innerText=(deviceBalance[x].credits-deviceOverviewInitial[x]).toFixed(2)
+        if(deviceDisplayMode.selectedIndex==3&&(deviceBalance[x].credits-deviceOverviewInitial[x]).toFixed(2)==0){
             row.style="display:none;"
         }
-        //device inactive
-        if(thisLastEarning>=24){
-            if(deviceDisplayMode.selectedIndex==1){//display mode hide inactive
+        totalCredits.innerText=deviceBalance[x].credits
+        lastEarning.innerText=(((new Date()).getTime()/1000-deviceBalance[x].lastEarning)/3600).toFixed(1)
+        if((((new Date()).getTime()/1000-deviceBalance[x].lastEarning)/3600).toFixed(1)>=24){
+            if(deviceDisplayMode.selectedIndex==1){
                 row.style="display:none;"
             }
+            lastEarning.style="background-color: #ff0000;"
         }else{
-            if(deviceDisplayMode.selectedIndex==2){//display mode only show inactive
+            if(deviceDisplayMode.selectedIndex==2){
                 row.style="display:none;"
             }
             activeDevicesNum++;
         }
     }
-    
-    //overview card
     earningPerDevice.innerText=(earningsTotal/earningDevicesNum/1000).toFixed(3)
     hgactiveDevices.innerText=hgactiveDevicesNum
     activeDevices.innerText=activeDevicesNum
     earningDevices.innerText=earningDevicesNum
-    
     var earningUserNum=0
-    var hgActiveUsersNum=0
+    var activeUsersNum=0
     for(x in userData){
-        hgActiveUsersNum++
+        activeUsersNum++
         var row=useroverviewTable.insertRow(1)
         row.insertCell(0).innerText=x
         row.insertCell(1).innerText=userData[x].deviceCount
         row.insertCell(2).innerText=userData[x].earningDeviceCount
-        row.insertCell(3).innerText=userData[x].activeDeviceCount
-        row.insertCell(4).innerText=userData[x].creditsEarned.toFixed(2)
-        row.insertCell(5).innerText=userData[x].totalCredits.toFixed(2)
         earningUserNum+=userData[x].earningDeviceCount>0?1:0
-
+        row.insertCell(3).innerText=userData[x].creditsEarned.toFixed(2)
+        row.insertCell(4).innerText=userData[x].totalCredits.toFixed(2)
     }
-    //overview card
-    hgActiveUsers.innerText=hgActiveUsersNum
+    activeUsers.innerText=activeUsersNum
     earningUsers.innerText=earningUserNum
     earningPerUser.innerText=(earningsTotal/earningUserNum/1000).toFixed(3)
     sortTable(deviceoverviewTable,2,true,'Credits Gained',deviceCreditsGained)
-    sortTable(useroverviewTable,4,true,'Credits Gained',userCreditsGained)
+    sortTable(useroverviewTable,3,true,'Credits Gained',userCreditsGained)
 }
 function calcNextPayout(){
     if(balUSD>0&&last7Total>0){

@@ -54,7 +54,7 @@ socket.addEventListener("message", function (event) {
     socket.send('{"action":"getdevicebalance","time":"now","echo":"now"}');
   }
   if (jsonData.echo == "enddate") {
-    deviceBalance = jsonData.balance;
+    deviceBalanceEnd = jsonData.balance;
     socket.send(
       '{"action":"getdevicebalance","starttime":' +
         new Date(startDateVal).getTime() / 1000 +
@@ -110,11 +110,12 @@ function updateTables() {
   for (var id in deviceOverviewInitial) {
     var earningDevice = false;
     hgactiveDevicesNum++;
-    last7Total += deviceBalance[id].credits - deviceOverviewInitial[id];
-
+    try{  
+      last7Total += deviceBalanceEnd[id].credits - deviceOverviewInitial[id];
+    }catch(e){deviceBalanceEnd[id]={"credits":deviceOverviewInitial[id]}}
     //device earning
-    if (deviceBalance[id].credits != deviceOverviewInitial[id]) {
-      earningsTotal += deviceBalance[id].credits - deviceOverviewInitial[id];
+    if (deviceBalanceEnd[id].credits != deviceOverviewInitial[id]) {
+      earningsTotal += deviceBalanceEnd[id].credits - deviceOverviewInitial[id];
       earningDevicesNum++;
       earningDevice = true;
     }
@@ -122,9 +123,9 @@ function updateTables() {
     deviceRow.insertCell(0).innerText = username;
     var userCell = deviceRow.insertCell(1);
     deviceRow.insertCell(2).innerText = (
-      deviceBalance[id].credits - deviceOverviewInitial[id]
+      deviceBalanceEnd[id].credits - deviceOverviewInitial[id]
     ).toFixed(2);
-    deviceRow.insertCell(3).innerText = deviceBalance[id].credits;
+    deviceRow.insertCell(3).innerText = deviceBalanceEnd[id].credits;
     var lastEarningCell = deviceRow.insertCell(4);
 
     var username = id;
@@ -155,19 +156,19 @@ function updateTables() {
       userData[username].deviceCount++;
       userData[username].earningDeviceCount += earningDevice ? 1 : 0;
       userData[username].creditsEarned =
-        deviceBalance[id].credits -
+      deviceBalanceEnd[id].credits -
         deviceOverviewInitial[id] +
         parseFloat(userData[tSplit[0].substr(1)].creditsEarned);
-      userData[username].totalCredits += deviceBalance[id].credits;
+      userData[username].totalCredits += deviceBalanceEnd[id].credits;
       userData[username].activeDeviceCount += thisLastEarning >= 24 ? 0 : 1;
       userDevices[username].push({
         //push device into user
         id: id,
         device: tSplit[1],
-        creditsEarned: (deviceBalance[id] - deviceOverviewInitial[id]).toFixed(
+        creditsEarned: (deviceBalanceEnd[id] - deviceOverviewInitial[id]).toFixed(
           2
         ),
-        totalCredits: deviceBalance[id],
+        totalCredits: deviceBalanceEnd[id],
       });
     } //end follows the pool format: #<user>*<device>*
     lastEarningCell.innerText = thisLastEarning;
@@ -176,7 +177,7 @@ function updateTables() {
     //display mode hide not earning
     if (
       deviceDisplayMode.selectedIndex == 3 &&
-      (deviceBalance[id].credits - deviceOverviewInitial[id]).toFixed(2) == 0
+      (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2) == 0
     ) {
       row.style = "display:none;";
     }

@@ -1,7 +1,7 @@
 v1.1.0 Add Support For More than 10 Devices
 v1.1.1 Fix uri encoding for device names
-v1.1.2 Fix graph showing UTC insted of local time
-v1.1.3 Show custom title in graph insetd of manufacturer
+v1.1.2 Fix graph showing UTC instead of local time
+v1.1.3 Show custom title in graph instead of manufacturer
 v1.1.4 Fix using js if statement in python
 v1.1.5 Fix null graph names and graph not showing all device
 v1.2.0 Allow setting graph name in config file
@@ -12,14 +12,14 @@ v1.5.0 Add Dashboard
 v1.6.0 Add graph tab to dashboard
 v1.6.1 Make dashboard default to overview tab
 v1.6.2 Fix dashboard links redirecting to absolute url
-v1.6.3 Move seven day logic to severside to save bandwith
+v1.6.3 Move seven day logic to sever-side to save bandwidth
 v1.6.4 Fx total trace sometimes not showing
 v1.7.0 Add devices tab to dashboard and change how data is stored ~%50 space saved
 v1.7.1 Fix endless loop of getdevicebalance
 v1.7.2 Fix getdevicebalance being called for every device
 v1.7.3 DecodeURI the title in the device table and add export csv button
 v1.8.0 Add users tab to dashboard
-v1.8.1 Fix not setting min date in dete selector
+v1.8.1 Fix not setting min date in date selector
 v1.8.2 Improved error handling for unparseable json messages
 v1.9.0 Add Last earning column and device filter to device table and separate html/js files
 v1.10.0 Add Last earning column to user table 
@@ -27,3 +27,4 @@ v1.11.0 Add option to disable graph
 v1.11.1 Code Cleanup and Enable DeepScan
 v1.12.0 Add end date selector for both user and device tables
 v1.12.1 Code Cleanup
+v1.12.2 Fix last earning is undefined when end date is changed

@@ -94,17 +94,19 @@ function updateTables(){
             earningDevicesNum++
             earningDevice=true
         }
-        var deviceRow=deviceoverviewTable.insertRow(1)
-        var lastEarning=deviceRow.insertCell(4)
+        var row=deviceoverviewTable.insertRow(1)
+        var user=row.insertCell(0),device=row.insertCell(1),creditsEarned=row.insertCell(2),totalCredits=row.insertCell(3),lastEarning=row.insertCell(4)
         var username=id
-        if(idmap[id]!=undefined){
+        if(idmap[id]==undefined){
+            username=id
+        }else{
             username=decodeURI(idmap[id].title)
         }
         var tSplit=username.split('*')
         var thisLastEarning=(((new Date()).getTime()/1000-deviceBalance[id].lastEarning)/3600).toFixed(1)
         if(tSplit[0].charAt(0)=='#'&&tSplit.length==3){//folows the pool format: #<user>*<device>*
             username=tSplit[0].substr(1)
-            deviceRow.insertCell(1).innerText=tSplit[1]
+            device.innerText=tSplit[1]
             if(userDevices[username]==undefined){//create user
                 userDevices[username]=[]
                 userData[username]={
@@ -129,9 +131,9 @@ function updateTables(){
             })
         }//end folows the pool format: #<user>*<device>*
 
-        deviceRow.insertCell(0).innerText=username
-        deviceRow.insertCell(2).innerText=(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)
-        deviceRow.insertCell(3).innerText=deviceBalance[id].credits
+        user.innerText=username
+        creditsEarned.innerText=(deviceBalance[id].credits-deviceOverviewInitial[id]).toFixed(2)
+        totalCredits.innerText=deviceBalance[id].credits
         lastEarning.innerText=thisLastEarning
         lastEarning.style=thisLastEarning>=24?"background-color: #ff0000;":""
 
@@ -162,13 +164,13 @@ function updateTables(){
     var hgActiveUsersNum=0
     for(x in userData){
         hgActiveUsersNum++
-        var userRow=useroverviewTable.insertRow(1)
-        userRow.insertCell(0).innerText=x
-        userRow.insertCell(1).innerText=userData[x].deviceCount
-        userRow.insertCell(2).innerText=userData[x].earningDeviceCount
-        userRow.insertCell(3).innerText=userData[x].activeDeviceCount
-        userRow.insertCell(4).innerText=userData[x].creditsEarned.toFixed(2)
-        userRow.insertCell(5).innerText=userData[x].totalCredits.toFixed(2)
+        var row=useroverviewTable.insertRow(1)
+        row.insertCell(0).innerText=x
+        row.insertCell(1).innerText=userData[x].deviceCount
+        row.insertCell(2).innerText=userData[x].earningDeviceCount
+        row.insertCell(3).innerText=userData[x].activeDeviceCount
+        row.insertCell(4).innerText=userData[x].creditsEarned.toFixed(2)
+        row.insertCell(5).innerText=userData[x].totalCredits.toFixed(2)
         earningUserNum+=userData[x].earningDeviceCount>0?1:0
 
     }

@@ -94,11 +94,12 @@ wsServer.on('request', function(request) {
                     case "getdevicebalance":
                         content=await wsReadFile("data.json")
                         jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                        var timeNow=(new Date()).getTime()/1000
                         var retbal={}
                         for (x in jsondata.dataFile){
-                            var date=jsondata.dataFile[x]['9']
-                            var id=jsondata.dataFile[x]['1']
-                            var credits=jsondata.dataFile[x]['8']
+                            date=jsondata.dataFile[x]['9']
+                            id=jsondata.dataFile[x]['1']
+                            credits=jsondata.dataFile[x]['8']
                             if(jsonMessage.time!="now"&&date>jsonMessage.time){
                                 if(retbal[id]==undefined){
                                     retbal[id]=credits
@@ -193,7 +194,7 @@ function genGraph(){
       if (err) 
         throw err;
         if(debug){
-            appendLog('results: '+results);
+            appendLog('results: %j', results);
         }
     });
   }
@@ -260,9 +261,9 @@ async function getDevices(){
         idmap={}
         appendLog("idmap.json could not be parsed")
     }
-    for(var device in jsonData){
+    for(device in jsonData){
         if(idmap[jsonData[device].id]==undefined||idmap[jsonData[device].id].title!=encodeURI(jsonData[device].title)){
-            var idmapData={
+            idmapData={
                 id:jsonData[device].id,
                 manufacturer:encodeURI(jsonData[device].manufacturer),
                 model:encodeURI(jsonData[device].model),
@@ -275,7 +276,7 @@ async function getDevices(){
             }
             idmap[jsonData[device].id]=idmapData
         }
-        var deviceData={
+        deviceData={
             1:jsonData[device].id,
             // 2:encodeURI(jsonData[device].manufacturer),
             // 3:encodeURI(jsonData[device].model),
@@ -337,6 +338,7 @@ function getConfig(keyname){
             value=defaultConfig[keyname];
             appendLog("Key: "+keyname+"Not found in config using default value: "+value);
         }
+
     }
     return value
 }

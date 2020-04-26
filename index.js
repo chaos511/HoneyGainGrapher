@@ -302,7 +302,7 @@ async function getDevices(){
         console.log("Pagenum: "+pageNum)
         pageNum++;
       getDevices();
-    }else if (getConfig("enableGraph")){
+    }else{
         genGraph();
     }
 }
@@ -320,17 +320,16 @@ function getConfig(keyname){
     try{
         value=config.get(keyname)
     }catch(e){
-        var defaultConfig=
-        {
-            "authToken":"<Insert Your Bearer Token>",
-            "pingInterval":3600,
-            "startOnTheHour":true,
-            "graphTitle":"Honey Gain Devices Delta",
-            "enableDashboard":true,
-            "enableGraph":true,
-            "useHTTPAuth":false,
-            "webserverPort":80,
-            "webserverHost":"127.0.0.1"
+        var defaultConfig={
+        "authToken":"<Insert Your Bearer Token>",
+        "pingInterval":3600,
+        "startOnTheHour":true,
+        "graphTitle":"Honey Gain Devices Delta",
+        "enableDashboard":true,
+        "useHTTPAuth":false,
+        "webserverPort":80,
+        "webserverHost":"127.0.0.1",
+        "autoUpdate":true
         }
         if(defaultConfig[keyname]==undefined){
             Error(e);

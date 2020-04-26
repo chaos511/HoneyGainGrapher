@@ -70,7 +70,7 @@ body{
     margin: auto;
     border: 3px solid wheat;
     left: 340px;
-    width: 800px;
+    width: 900px;
     height: auto;
 }
 .cardLabel {
@@ -83,7 +83,7 @@ body{
 }
 .cardLabel2{
     font-size: 120%;
-	width: 736px;
+	width: 836px;
 	line-height: 5px;
 	padding: 32px;  
     background-color:#097479;

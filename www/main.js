@@ -141,16 +141,26 @@ function updateTables() {
     ).toFixed(2);
 
     var totalCreditsCell = deviceRow.insertCell(3);
-    totalCreditsCell.innerText = deviceBalanceEnd[id].credits;
+    totalCreditsCell.innerText ="$"+deviceBalanceEnd[id].credits.toFixed(2);
 
-    var lastEarningCell = deviceRow.insertCell(4);
+    var balanceGainedCell = deviceRow.insertCell(4);
+    balanceGainedCell.innerText = "$"+(
+      (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]) /
+      1000
+    ).toFixed(2);
+
+    var totalBalanceCell = deviceRow.insertCell(5);
+    totalBalanceCell.innerText = "$"+(deviceBalanceEnd[id].credits / 1000).toFixed(
+      2
+    );
+
+    var lastEarningCell = deviceRow.insertCell(6);
 
     var tSplit = username.split("*");
     var thisLastEarning = (
       (new Date().getTime() / 1000 - deviceBalance[id].lastEarning) /
       3600
     ).toFixed(1);
-    console.log(username + " --- " + rowCount);
 
     if (tSplit[0].charAt(0) == "#" && tSplit.length == 3) {
       console.log(true);
@@ -234,6 +244,8 @@ function updateTables() {
     userRow.insertCell(3).innerText = userData[x].activeDeviceCount;
     userRow.insertCell(4).innerText = userData[x].creditsEarned.toFixed(2);
     userRow.insertCell(5).innerText = userData[x].totalCredits.toFixed(2);
+    userRow.insertCell(6).innerText = "$"+(userData[x].creditsEarned/1000).toFixed(2);
+    userRow.insertCell(7).innerText = "$"+(userData[x].totalCredits/1000).toFixed(2);
     earningUserNum += userData[x].earningDeviceCount > 0 ? 1 : 0;
   }
   //overview card

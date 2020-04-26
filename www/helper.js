@@ -110,15 +110,23 @@ function sortLoop(){
     rows = table.rows;
     for (i = 1; i < (rows.length - 1); i++) {
         shouldSwitch = false;
-        x = rows[i].getElementsByTagName("TD")[sortIndex];
-        y = rows[i + 1].getElementsByTagName("TD")[sortIndex];
+        x = rows[i].getElementsByTagName("TD")[sortIndex].innerHTML;
+        y = rows[i + 1].getElementsByTagName("TD")[sortIndex].innerHTML;
+        var xPrefix
+        var yPrefix
+        if(x.includes("$")){
+            x=x.substr(1)
+        }
+        if(y.includes("$")){
+            y=y.substr(1)
+        }
         if(isnumber){
-            if ((parseFloat(x.innerHTML) < parseFloat(y.innerHTML)&&!inverSort[table.id])||(parseFloat(x.innerHTML) > parseFloat(y.innerHTML)&&inverSort[table.id])) {
+            if ((parseFloat(x) < parseFloat(y)&&!inverSort[table.id])||(parseFloat(x) > parseFloat(y)&&inverSort[table.id])) {
                 shouldSwitch = true;
                 break;
             }
         }else{
-            if ((x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()&&inverSort[table.id])||(x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()&&!inverSort[table.id])) {
+            if ((x.toLowerCase() < y.toLowerCase()&&inverSort[table.id])||(x.toLowerCase() > y.toLowerCase()&&!inverSort[table.id])) {
                 shouldSwitch = true;
                 break;
             }

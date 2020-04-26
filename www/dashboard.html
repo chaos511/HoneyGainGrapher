@@ -88,9 +88,11 @@
             <tr>
                 <th onclick="sortTable(deviceoverviewTable,0,false,'User',this)" >User</th>
                 <th onclick="sortTable(deviceoverviewTable,1,false,'Device',this)" >Device</th>
-                <th onclick="sortTable(deviceoverviewTable,2,true,'Credits Gained',this)"  id="deviceCreditsGained">Credits Gained</th>
+                <th onclick="sortTable(deviceoverviewTable,2,true,'Credits Gained',this)" >Credits Gained</th>
                 <th onclick="sortTable(deviceoverviewTable,3,true,'Total Credits',this)">Total Credits</th>
-                <th onclick="sortTable(deviceoverviewTable,4,true,'Last Earning<br>Hours Ago',this)">Last Earning<br>Hours Ago</th>
+                <th onclick="sortTable(deviceoverviewTable,4,true,'Balance Gained',this)"  id="deviceCreditsGained">Balance Gained</th>
+                <th onclick="sortTable(deviceoverviewTable,5,true,'Total Balance',this)">Total Balance</th>
+                <th onclick="sortTable(deviceoverviewTable,6,true,'Last Earning<br>Hours Ago',this)">Last Earning<br>Hours Ago</th>
             </tr>
         </table>
         <button onclick="exportToCsv(deviceoverviewTable)"> Export To CSV</button>
@@ -120,8 +122,10 @@
                 <th onclick="sortTable(useroverviewTable,1,true,'Devices',this)" >Devices</th>
                 <th onclick="sortTable(useroverviewTable,2,true,'Earning Devices',this)" >Earning Device</th>
                 <th onclick="sortTable(useroverviewTable,3,true,'Active Devices',this)" >Active Devices</th>
-                <th onclick="sortTable(useroverviewTable,4,true,'Credits Gained',this)" id="userCreditsGained">Credits Gained</th>
+                <th onclick="sortTable(useroverviewTable,4,true,'Credits Gained',this)" >Credits Gained</th>
                 <th onclick="sortTable(useroverviewTable,5,true,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(useroverviewTable,6,true,'Balance Gained',this)"  id="userCreditsGained">Balance Gained</th>
+                <th onclick="sortTable(useroverviewTable,7,true,'Total Balance',this)">Total Balance</th>
             </tr>
         </table>
         <button onclick="exportToCsv(useroverviewTable)"> Export To CSV</button>

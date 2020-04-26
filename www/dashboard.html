@@ -70,9 +70,9 @@
         <div class="innerCardText1" id="earningPerDevice">Loading...</div>
         <div class="innerCardLabel1">USD</div>
         <label class="innerCardText2" for="startDate">Start date:</label>
-        <input type="date" id="startDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(this.value)"><br>
-        <label class="innerCardText2" for="endDate" style="visibility: hidden;">End date:</label>
-        <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" style="visibility: hidden;">
+        <input type="date" id="startDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(this.value,endDate[0].value)"><br>
+        <label class="innerCardText2" for="endDate" >End date:</label>
+        <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00"  onchange="onDateChange(startDate[0].value,this.value)">
     </div>
     <div class="card4" id="deviceStuffCard">
         <div class="cardLabel2">More Device Stuff</div>
@@ -108,9 +108,9 @@
         <div class="innerCardText1" id="earningPerUser">Loading...</div>
         <div class="innerCardLabel1">USD</div>
         <label class="innerCardText2" for="startDate">Start date:</label>
-        <input type="date" id="startDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(this.value)"><br>
-        <label class="innerCardText2" for="endDate" style="visibility: hidden;">End date:</label>
-        <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" style="visibility: hidden;">
+        <input type="date" id="startDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(this.value,endDate[0].value)"><br>
+        <label class="innerCardText2" for="endDate" >End date:</label>
+        <input type="date" id="endDate" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChange(startDate[0].value,this.value)" >
     </div>
     <div class="card4" id="userStuffCard">
         <div class="cardLabel2">More User Stuff</div>

@@ -99,10 +99,13 @@ wsServer.on('request', function(request) {
                             var date=jsondata.dataFile[x]['9']
                             var id=jsondata.dataFile[x]['1']
                             var credits=jsondata.dataFile[x]['8']
-                            if(jsonMessage.time!="now"&&date>jsonMessage.time){
+                            if(jsonMessage.time!="now"&&jsonMessage.starttime!=undefined&&date>jsonMessage.starttime){
                                 if(retbal[id]==undefined){
                                     retbal[id]=credits
                                 }
+                            }
+                            if(jsonMessage.time!="now"&&jsonMessage.endtime!=undefined&&date<jsonMessage.endtime){
+                                retbal[id]={"credits":credits}
                             }
                             if(jsonMessage.time=="now"){
                                 if(retbal[id]!=undefined){
@@ -115,7 +118,7 @@ wsServer.on('request', function(request) {
                                 }
                             }
                         }
-                        connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"time":"'+jsonMessage.time+'","echo":"'+jsonMessage.echo+'"}');
+                        connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"time":"'+(jsonMessage.starttime||jsonMessage.endtime)+'","echo":"'+jsonMessage.echo+'"}');
                     break;
                     case "getstarttime":
                         content=await wsReadFile("data.json")

@@ -256,10 +256,10 @@ function updateTables() {
     deviceoverviewTable,
     2,
     true,
-    "Credits Gained",
+    "Balance Gained",
     deviceCreditsGained
   );
-  sortTable(useroverviewTable, 4, true, "Credits Gained", userCreditsGained);
+  sortTable(useroverviewTable, 4, true, "Balance Gained", userCreditsGained);
 }
 function calcNextPayout() {
   if (balUSD > 0 && last7Total > 0) {

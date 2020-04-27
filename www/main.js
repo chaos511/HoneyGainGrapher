@@ -117,7 +117,7 @@ function updateTransactionTable() {
       "earnings":{"displayName":"Gathered","show":[1,1,0,0,0]},
       "payout_reservation":{"displayName":"Payout Reservation","show":[1,0,1,0,0]},
       "coupon":{"displayName":"Coupon","show":[1,0,0,1,0]},
-      "referral":{"displayName":"Referral","show":[1,0,0,1,0]},
+      "referral":{"displayName":"Referral","show":[1,0,0,0,1]},
     }
     
     transactionRow.transaction=transaction

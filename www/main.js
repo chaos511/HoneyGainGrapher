@@ -114,9 +114,10 @@ function updateTransactionTable() {
   for (var transaction of transactions) {
     var transactionRow = transactionOverviewTable.insertRow(1);
     var typeMap={
-      "earnings":{"displayName":"Gathered","show":[1,1,0,0]},
-      "payout_reservation":{"displayName":"Payout Reservation","show":[1,0,1,0]},
-      "coupon":{"displayName":"Coupon","show":[1,0,0,1]},
+      "earnings":{"displayName":"Gathered","show":[1,1,0,0,0]},
+      "payout_reservation":{"displayName":"Payout Reservation","show":[1,0,1,0,0]},
+      "coupon":{"displayName":"Coupon","show":[1,0,0,1,0]},
+      "referral":{"displayName":"Referral","show":[1,0,0,1,0]},
     }
     
     transactionRow.transaction=transaction

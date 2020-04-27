@@ -36,3 +36,4 @@ v1.13.3 Fix showing loading... when Balance or last7day earnings is zero
 v1.14.0 Add Transactions Page
 v1.14.1 Fix Display mode option not working on devices tab
 v1.14.2 Add referral to transaction type list
+v1.14.3 Add payout_reservation_return and payout type list

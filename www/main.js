@@ -116,8 +116,11 @@ function updateTransactionTable() {
     var typeMap={
       "earnings":{"displayName":"Gathered","show":[1,1,0,0,0]},
       "payout_reservation":{"displayName":"Payout Reservation","show":[1,0,1,0,0]},
+      "payout":{"displayName":"Payout","show":[1,0,1,0,0]},
+      "payout_reservation_return":{"displayName":"Payout Reservation Return","show":[1,0,1,0,0]},
       "coupon":{"displayName":"Coupon","show":[1,0,0,1,0]},
       "referral":{"displayName":"Referral","show":[1,0,0,0,1]},
+      
     }
     
     transactionRow.transaction=transaction
@@ -134,7 +137,7 @@ function updateTransactionTable() {
     if(transaction.type=="earnings"){
       gatheredAmountNum=(parseFloat(gatheredAmountNum)+parseFloat(transaction.amount_usd_cents)/100).toFixed(2)
     }
-    if(transaction.type=="payout_reservation"){
+    if(transaction.type=="payout_reservation"||transaction.type=="payout"){
       payoutAmountNum=(parseFloat(payoutAmountNum)+parseFloat(transaction.amount_usd_cents)/100).toFixed(2)
     }
     console.log(gatheredAmountNum)

@@ -257,22 +257,23 @@ function updateTables() {
     lastEarningCell.style =
       thisLastEarning >= 24 ? "background-color: #ff0000;" : "";
     //display mode hide not earning
+    console.log((deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2))
     if (
       deviceDisplayMode.selectedIndex == 3 &&
       (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2) == 0
     ) {
-      row.style = "display:none;";
+      deviceRow.style = "display:none;";
     }
     //device inactive
     if (thisLastEarning >= 24) {
       if (deviceDisplayMode.selectedIndex == 1) {
         //display mode hide inactive
-        row.style = "display:none;";
+        deviceRow.style = "display:none;";
       }
     } else {
       if (deviceDisplayMode.selectedIndex == 2) {
         //display mode only show inactive
-        row.style = "display:none;";
+        deviceRow.style = "display:none;";
       }
       activeDevicesNum++;
     }

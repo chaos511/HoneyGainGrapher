@@ -34,3 +34,4 @@ v1.13.1 Fix showing Credits Gained twice
 v1.13.2 Fix Total Credits having $ prefix
 v1.13.3 Fix showing loading... when Balance or last7day earnings is zero
 v1.14.0 Add Transactions Page
+v1.14.1 Fix Display mode option not working on devices tab

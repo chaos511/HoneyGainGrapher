@@ -137,7 +137,7 @@ function updateTransactionTable() {
     if(transaction.type=="earnings"){
       gatheredAmountNum=(parseFloat(gatheredAmountNum)+parseFloat(transaction.amount_usd_cents)/100).toFixed(2)
     }
-    if(transaction.type=="payout_reservation"||transaction.type=="payout"){
+    if(transaction.type=="payout_reservation"||transaction.type=="payout"||transaction.type=="payout_reservation_return"){
       payoutAmountNum=(parseFloat(payoutAmountNum)+parseFloat(transaction.amount_usd_cents)/100).toFixed(2)
     }
     console.log(gatheredAmountNum)

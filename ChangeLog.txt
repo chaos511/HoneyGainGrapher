@@ -38,3 +38,4 @@ v1.14.1 Fix Display mode option not working on devices tab
 v1.14.2 Add referral to transaction type list
 v1.14.3 Add payout_reservation_return and payout type list
 v1.14.4 Rename selector Only Payout from Only Payout Reservation
+v1.14.5 Include payout_reservation_return in total payout calculation

@@ -5,6 +5,7 @@ const socket = new WebSocket("ws://" + document.location.host, "echo-protocol");
 var sevenDay = 7 * 24 * 60 * 60;
 var oneDay = 1 * 24 * 60 * 60;
 var last7Total = 0;
+var nowReceived=false
 var balUSD;
 var sidebarWidth = 0;
 var last7initial = {};
@@ -63,6 +64,7 @@ socket.addEventListener("message", function (event) {
   }
   if (jsonData.echo == "now") {
     deviceBalance = jsonData.balance;
+    nowReceived=true
     for (x in last7initial) {
       last7Total += deviceBalance[x].credits - last7initial[x];
       last7Balance.innerText = last7Total.toFixed(2);
@@ -262,7 +264,7 @@ function updateTables() {
   sortTable(useroverviewTable, 4, true, "Balance Gained", userCreditsGained);
 }
 function calcNextPayout() {
-  if (balUSD > 0 && last7Total > 0) {
+  if (balUSD !=undefined && nowReceived) {
     nextPayout.innerText = Math.max(
       ((7 / (last7Total / 1000)) * (20 - balUSD)).toFixed(2),
       0

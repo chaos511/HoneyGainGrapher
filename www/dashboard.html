@@ -23,22 +23,20 @@
     <div class="card1" id="balanceCard">
         <div class="cardLabel">Current Balance</div>
         <div class="innerCardText1" id="currentBalanceUSD"> Loading...</div>
-        <div class="innerCardLabel1"> USD</div>
+        <div class="innerCardLabel1"> Credits:</div>
         <div class="innerCardText1" id="currentBalance"> Loading...</div>
-        <div class="innerCardLabel1"> Credits</div>
+        <div class="innerCardLabel1"> GB:</div>
         <div class="innerCardText1" id="currentBalanceGB"> Loading...</div>
-        <div class="innerCardLabel1"> GB</div>
     </div>
     <div class="card2" id="last7Card">
         <div class="cardLabel">Last 7 Days</div>
         <div class="innerCardText1" id="last7BalanceUSD"> Loading...</div>
-        <div class="innerCardLabel1"> USD</div>
+        <div class="innerCardLabel1"> Credits:</div>
         <div class="innerCardText1" id="last7Balance"> Loading...</div>
-        <div class="innerCardLabel1"> Credits</div>
+        <div class="innerCardLabel1"> GB:</div>
         <div class="innerCardText1" id="last7BalanceGB"> Loading...</div>
-        <div class="innerCardLabel1"> GB</div>
+        <div class="innerCardLabel1"> per Day:</div>
         <div class="innerCardText1" id="last7Rate"> Loading...</div>
-        <div class="innerCardLabel1"> USD per Day</div>
     </div>
     <div class="card3" id="payoutCard">
         <div class="cardLabel">Payout</div>
@@ -86,13 +84,13 @@
         </select>
         <table  class="searchable sortable" id="deviceoverviewTable">
             <tr>
-                <th onclick="sortTable(deviceoverviewTable,0,false,'User',this)" >User</th>
-                <th onclick="sortTable(deviceoverviewTable,1,false,'Device',this)" >Device</th>
-                <th onclick="sortTable(deviceoverviewTable,2,true,'Credits Gained',this)" >Credits Gained</th>
-                <th onclick="sortTable(deviceoverviewTable,3,true,'Total Credits',this)">Total Credits</th>
-                <th onclick="sortTable(deviceoverviewTable,4,true,'Balance Gained',this)"  id="deviceCreditsGained">Balance Gained</th>
-                <th onclick="sortTable(deviceoverviewTable,5,true,'Total Balance',this)">Total Balance</th>
-                <th onclick="sortTable(deviceoverviewTable,6,true,'Last Earning<br>Hours Ago',this)">Last Earning<br>Hours Ago</th>
+                <th onclick="sortTable(deviceoverviewTable,0,0,'User',this)" >User</th>
+                <th onclick="sortTable(deviceoverviewTable,1,0,'Device',this)" >Device</th>
+                <th onclick="sortTable(deviceoverviewTable,2,1,'Credits Gained',this)" >Credits Gained</th>
+                <th onclick="sortTable(deviceoverviewTable,3,1,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(deviceoverviewTable,4,1,'Balance Gained',this)"  id="deviceCreditsGained">Balance Gained</th>
+                <th onclick="sortTable(deviceoverviewTable,5,1,'Total Balance',this)">Total Balance</th>
+                <th onclick="sortTable(deviceoverviewTable,6,1,'Last Earning<br>Hours Ago',this)">Last Earning<br>Hours Ago</th>
             </tr>
         </table>
         <button onclick="exportToCsv(deviceoverviewTable)"> Export To CSV</button>
@@ -118,17 +116,53 @@
         <div class="cardLabel2">More User Stuff</div>
         <table  class="searchable sortable" id="useroverviewTable">
             <tr>
-                <th onclick="sortTable(useroverviewTable,0,false,'User',this)" >User</th>
-                <th onclick="sortTable(useroverviewTable,1,true,'Devices',this)" >Devices</th>
-                <th onclick="sortTable(useroverviewTable,2,true,'Earning Devices',this)" >Earning Device</th>
-                <th onclick="sortTable(useroverviewTable,3,true,'Active Devices',this)" >Active Devices</th>
-                <th onclick="sortTable(useroverviewTable,4,true,'Credits Gained',this)" >Credits Gained</th>
-                <th onclick="sortTable(useroverviewTable,5,true,'Total Credits',this)">Total Credits</th>
-                <th onclick="sortTable(useroverviewTable,6,true,'Balance Gained',this)"  id="userCreditsGained">Balance Gained</th>
-                <th onclick="sortTable(useroverviewTable,7,true,'Total Balance',this)">Total Balance</th>
+                <th onclick="sortTable(useroverviewTable,0,0,'User',this)" >User</th>
+                <th onclick="sortTable(useroverviewTable,1,1,'Devices',this)" >Devices</th>
+                <th onclick="sortTable(useroverviewTable,2,1,'Earning Devices',this)" >Earning Device</th>
+                <th onclick="sortTable(useroverviewTable,3,1,'Active Devices',this)" >Active Devices</th>
+                <th onclick="sortTable(useroverviewTable,4,1,'Credits Gained',this)" >Credits Gained</th>
+                <th onclick="sortTable(useroverviewTable,5,1,'Total Credits',this)">Total Credits</th>
+                <th onclick="sortTable(useroverviewTable,6,1,'Balance Gained',this)"  id="userCreditsGained">Balance Gained</th>
+                <th onclick="sortTable(useroverviewTable,7,1,'Total Balance',this)">Total Balance</th>
             </tr>
         </table>
         <button onclick="exportToCsv(useroverviewTable)"> Export To CSV</button>
+    </div>
+</div>
+
+<div class="page" id="transactionPage">
+    <div class="card1" id="transactionOverviewCard">
+        <div class="cardLabel">Transaction Overview</div>
+        <div class="innerCardLabel1">Payout Amount:</div>
+        <div class="innerCardText1" id="payoutAmount">Loading...</div>
+        <div class="innerCardLabel1">Earned Amount:</div>
+        <div class="innerCardText1" id="gatheredAmount">Loading...</div>
+        <label class="innerCardText2" for="startDate">Start date:</label>
+        <input type="date" id="startDateTrans" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChangeTrans(this.value,endDateTrans.value)"><br>
+        <label class="innerCardText2" for="endDate" >End date:</label>
+        <input type="date" id="endDateTrans" name="" value="0000-00-00"min="0000-00-00" max="0000-00-00" onchange="onDateChangeTrans(startDateTrans.value,this.value)" >
+    </div>
+    <div class="card4" id="transactionStuffCard">
+        <div class="cardLabel2">More Transaction Stuff</div>
+        <label class="innerCardText2" for="transactionsDisplayMode">Display Mode:</label>
+
+        <select id="transactionsDisplayMode" onchange="updateTransactionTable()">
+            <option>Show All</option>
+            <option>Only Gathered</option>
+            <option>Only Payout Reservation</option>
+            <option>Only Coupon</option>
+          </select>
+        <table  class="searchable sortable" id="transactionOverviewTable">
+            <tr>
+                <th onclick="sortTable(transactionOverviewTable,0,0,'User',this)" >Type</th>
+                <th onclick="sortTable(transactionOverviewTable,1,1,'Amount',this)" >Amount</th>
+                <th onclick="sortTable(transactionOverviewTable,2,1,'Amount USD',this)" >Amount USD</th>
+                <th onclick="sortTable(transactionOverviewTable,3,2,'Timestamp',this)" >Timestamp</th>
+
+
+            </tr>
+        </table>
+        <button onclick="exportToCsv(transactionOverviewTable)"> Export To CSV</button>
     </div>
 </div>
 
@@ -137,8 +171,13 @@
     <div class="menuItem" onclick="document.location.href='dashboard.html#graph';   closeSidebar()">Graph </div>
     <div class="menuItem" onclick="document.location.href='dashboard.html#devices'; closeSidebar()">Devices </div>
     <div class="menuItem" onclick="document.location.href='dashboard.html#users'; closeSidebar()">Users </div>
+    <div class="menuItem" onclick="document.location.href='dashboard.html#transactions'; closeSidebar()">Transactions </div>
+</div>
+
+<div class="popup">
 
 </div>
+
 </body>
 </html>
 <script src="helper.js"></script>

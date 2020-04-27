@@ -5,7 +5,6 @@ const fs = require('fs');
 let {PythonShell} = require('python-shell')
 var path = require('path');
 const WebSocketServer = require('websocket').server;
-var pageNum=1;
 var numOfDevices=0;
 const debug=true;
 var count=0;
@@ -93,39 +92,38 @@ wsServer.on('request', function(request) {
                     break;
                     case "getdevicebalance":
                         content=await wsReadFile("data.json")
-                        jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
-                        var retbal={}
-                        for (x in jsondata.dataFile){
-                            var date=jsondata.dataFile[x]['9']
-                            var id=jsondata.dataFile[x]['1']
-                            var credits=jsondata.dataFile[x]['8']
+                        jsonData=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                        var retBal={}
+                        for (x in jsonData.dataFile){
+                            var date=jsonData.dataFile[x]['9']
+                            var id=jsonData.dataFile[x]['1']
+                            var credits=jsonData.dataFile[x]['8']
                             if(jsonMessage.time!="now"&&jsonMessage.starttime!=undefined&&date>jsonMessage.starttime){
-                                if(retbal[id]==undefined){
-                                    retbal[id]=credits
+                                if(retBal[id]==undefined){
+                                    retBal[id]=credits
                                 }
                             }
                             if(jsonMessage.time!="now"&&jsonMessage.endtime!=undefined&&date<jsonMessage.endtime){
-                                retbal[id]={"credits":credits}
+                                retBal[id]={"credits":credits}
                             }
                             if(jsonMessage.time=="now"){
-                                if(retbal[id]!=undefined){
-                                    if(credits>retbal[id].credits){
-                                        // retbal[id]={"credits":credits,"lastEarning":Math.max(parseInt(date),parseInt(retbal[id].lastEarning))}
-                                        retbal[id]={"credits":credits,"lastEarning":date}
+                                if(retBal[id]!=undefined){
+                                    if(credits>retBal[id].credits){
+                                        retBal[id]={"credits":credits,"lastEarning":date}
                                     }
                                 }else{
-                                    retbal[id]={"credits":credits,"lastEarning":date}
+                                    retBal[id]={"credits":credits,"lastEarning":date}
                                 }
                             }
                         }
-                        connection.sendUTF('{"balance":'+JSON.stringify(retbal)+',"time":"'+(jsonMessage.starttime||jsonMessage.endtime)+'","echo":"'+jsonMessage.echo+'"}');
+                        connection.sendUTF('{"balance":'+JSON.stringify(retBal)+',"time":"'+(jsonMessage.starttime||jsonMessage.endtime)+'","echo":"'+jsonMessage.echo+'"}');
                     break;
                     case "getstarttime":
                         content=await wsReadFile("data.json")
-                        jsondata=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                        jsonData=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
                         var retTime=(new Date()).getTime()/1000
-                        for (x in jsondata.dataFile){
-                            retTime=Math.min(retTime,jsondata.dataFile[x]['9'])                                    
+                        for (x in jsonData.dataFile){
+                            retTime=Math.min(retTime,jsonData.dataFile[x]['9'])                                    
                         }
                         connection.sendUTF('{"time":"'+retTime+'","echo":"'+jsonMessage.echo+'"}');
                     break;
@@ -137,6 +135,22 @@ wsServer.on('request', function(request) {
                         content=await wsReadFile("idmap.json")
                         connection.sendUTF('{"idmap":'+content+',"echo":"'+jsonMessage.echo+'"}');
                     break;
+                    case "gettransactions":
+                        getTransactions(1)
+                        try{
+                            transactionsArray=JSON.parse(await ReadFile('transactions.json','[]'))
+                        }catch{
+                            console.log('Cannot Parse File: transactions.json')
+                        }                       
+                        var retData=[]
+                        for (var transaction of transactionsArray){
+                            var transactionDate=(new Date(transaction.created_at)).getTime()
+                            if(transactionDate>jsonMessage.starttime&&transactionDate<jsonMessage.endtime){
+                                retData.push(transaction)
+                            }
+                        }
+                        connection.sendUTF('{"transactions":'+JSON.stringify(retData)+',"echo":"'+jsonMessage.echo+'"}');
+                    break;
                 }
             }
         }
@@ -146,13 +160,13 @@ wsServer.on('request', function(request) {
     });
 });
 
-function wsReadFile(fpath){
+function wsReadFile(fPath){
     return new Promise(resolve => {
-        fs.readFile(fpath, function(error, content) {
+        fs.readFile(fPath, function(error, content) {
             if (error) {
                 if(error.code == 'ENOENT'){
-                    connection.sendUTF("Error 404: File "+fpath+" Not Found");
-                    appendLog("Error 404: File "+fpath+" Not Found")
+                    connection.sendUTF("Error 404: File "+fPath+" Not Found");
+                    appendLog("Error 404: File "+fPath+" Not Found")
                 }
                 resolve(undefined)
             }
@@ -162,14 +176,14 @@ function wsReadFile(fpath){
         });
     })
 }
-function ReadFile(fpath,onfail){
+function ReadFile(fPath,onFail){
     return new Promise(resolve => {
-        fs.readFile(fpath, function(error, content) {
+        fs.readFile(fPath, function(error, content) {
             if (error) {
                 if(error.code == 'ENOENT'){
-                    appendLog("Error 404: File "+fpath+" Not Found")
+                    appendLog("Error 404: File "+fPath+" Not Found")
                 }
-                resolve(onfail)
+                resolve(onFail)
             }
             else {
                 resolve(content)
@@ -237,11 +251,34 @@ function sendRequest(url){
         });
     });
 }
-
+function getConfig(keyName){
+    var value;
+    try{
+        value=config.get(keyName)
+    }catch(e){
+        var defaultConfig=
+        {
+            "authToken":"<Insert Your Bearer Token>",
+            "pingInterval":3600,
+            "startOnTheHour":true,
+            "graphTitle":"Honey Gain Devices Delta",
+            "enableDashboard":true,
+            "enableGraph":true,
+            "useHTTPAuth":false,
+            "webserverPort":80,
+            "webserverHost":"127.0.0.1"
+        }
+        if(defaultConfig[keyName]==undefined){
+            Error(e);
+        }else{
+            value=defaultConfig[keyName];
+            appendLog("Key: "+keyName+" Not found in config using default value: "+value);
+        }
+    }
+    return value
+}
 async function getNumOfDevices(){
     timestamp=Math.round(Date.now() / 1000)
-    devnum=-1
-    pageNum=1;
     var x= await sendRequest('/api/v1/users/me');
     var jsonData=JSON.parse(x).data;
     numOfDevices=jsonData.total_devices;
@@ -250,21 +287,21 @@ async function getNumOfDevices(){
     }
    
 }
-async function getDevices(){
-    var x=await sendRequest('/api/v1/devices'+(pageNum==1?'':'?page='+pageNum))
-    var jsonData=JSON.parse(x).data
-    var idmap
+async function getDevices(pageNum){
+    var res=await sendRequest('/api/v1/devices'+(pageNum==1?'':'?page='+pageNum))
+    var jsonData=JSON.parse(res).data
+    var idMap
     try{
-        idmap=JSON.parse(await ReadFile("idmap.json","{}"))
+        idMap=JSON.parse(await ReadFile("idmap.json","{}"))
     }catch{
 
     }
-    if(idmap==undefined){
-        idmap={}
+    if(idMap==undefined){
+        idMap={}
         appendLog("idmap.json could not be parsed")
     }
     for(var device in jsonData){
-        if(idmap[jsonData[device].id]==undefined||idmap[jsonData[device].id].title!=encodeURI(jsonData[device].title)){
+        if(idMap[jsonData[device].id]==undefined||idMap[jsonData[device].id].title!=encodeURI(jsonData[device].title)){
             var idmapData={
                 id:jsonData[device].id,
                 manufacturer:encodeURI(jsonData[device].manufacturer),
@@ -276,7 +313,7 @@ async function getDevices(){
             if(debug){
                 appendLog("device not found or changed adding: "+JSON.stringify(idmapData))
             }
-            idmap[jsonData[device].id]=idmapData
+            idMap[jsonData[device].id]=idmapData
         }
         var deviceData={
             1:jsonData[device].id,
@@ -295,7 +332,7 @@ async function getDevices(){
             }
         }); 
     }
-    fs.writeFile("idmap.json", JSON.stringify(idmap), function(err) {
+    fs.writeFile("idmap.json", JSON.stringify(idMap), function(err) {
         if(err) {
             return console.log(err);
         }
@@ -303,48 +340,74 @@ async function getDevices(){
     if(pageNum<numOfDevices/10){
         console.log("Pagenum: "+pageNum)
         pageNum++;
-      getDevices();
+      getDevices(pageNum+1);
     }else if (getConfig("enableGraph")){
         genGraph();
     }
 }
+async function getTransactions(pageNum,inArray){
+    var res=await sendRequest('https://dashboard.honeygain.com/api/v1/transactions?page='+pageNum)
+    var resJson=JSON.parse(res)
+    var resArray=resJson.data
+    var totalPages=resJson.meta.pagination.total_pages
+    var totalItems=resJson.meta.pagination.total_items
+    var transactionsArray=[]
+    if(pageNum==1){
+        try{
+            transactionsArray=JSON.parse(await ReadFile('transactions.json','[]'))
+        }catch{
+            console.log('Cannot Parse File: transactions.json')
+        }
+    }else{
+        transactionsArray=inArray
+    }
+    if(totalItems==transactionsArray.length){
+        if(debug){
+            console.log("totalItems length match not updating transactions")
+        }
+        return
+    }
+    resArray.reverse()
+    var index=0
+    for(var newData of resArray){
+        if(transactionsArray.indexOf(newData)==-1&&index==0){
+            if(pageNum<totalPages){
+                transactionsArray=await getTransactions(pageNum+1,transactionsArray)
+            }
+        }
+        transactionsArray.push(newData)
+        index++
+    }
+
+    if(pageNum==1){
+        var outString='[\n'
+        for(var x of transactionsArray){
+            outString+=JSON.stringify(x)+',\n'
+        }
+        outString=outString.substr(0,outString.length-2)
+        outString+='\n]'
+        fs.writeFile("transactions.json", outString, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        }); 
+    }else{
+        return transactionsArray
+    }
+}
+
 function main(){
     getNumOfDevices()
-    getDevices()
+    getDevices(1)
+    getTransactions(1)
 }
 function init(){
-    setInterval(main,getConfig("pingInterval")*1000)
-    getNumOfDevices()
-    getDevices()    
-}
-function getConfig(keyname){
-    var value;
-    try{
-        value=config.get(keyname)
-    }catch(e){
-        var defaultConfig=
-        {
-            "authToken":"<Insert Your Bearer Token>",
-            "pingInterval":3600,
-            "startOnTheHour":true,
-            "graphTitle":"Honey Gain Devices Delta",
-            "enableDashboard":true,
-            "enableGraph":true,
-            "useHTTPAuth":false,
-            "webserverPort":80,
-            "webserverHost":"127.0.0.1"
-        }
-        if(defaultConfig[keyname]==undefined){
-            Error(e);
-        }else{
-            value=defaultConfig[keyname];
-            appendLog("Key: "+keyname+"Not found in config using default value: "+value);
-        }
-    }
-    return value
+    setInterval(main,getConfig("pingInterval")*1000) 
+    main()
 }
 var passedIntervals=parseInt(((new Date).getMinutes()*60+(new Date).getSeconds())/getConfig("pingInterval"))
 var nextIntervalTime=(passedIntervals+1)*getConfig("pingInterval")
 var secondsToNextInterval=nextIntervalTime-((new Date).getMinutes()*60+(new Date).getSeconds())
 setTimeout(init,secondsToNextInterval*1000)
-main()
+// main()
+getTransactions(1)

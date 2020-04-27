@@ -12,7 +12,7 @@ function exportToCsv(table){
     var longest= findLongestRowLength(rows)
     var lines=[]
     var linesString;
-    for(row of rows){
+    for(var row of rows){
         var line=""
         for(var x=0;x<longest;x++){
             if(row.children[x]!=undefined){
@@ -79,11 +79,11 @@ function openSidebar(){
 var lastElement={}
 var lastBaseName={}
 var inverSort={"deviceoverviewTable":false,"useroverviewTable":false}
-var table, rows, sorting, i, x, y, shouldSwitch,sortIndex,isnumber,sortLoopInterval;
+var table, rows, sorting, i, x, y, shouldSwitch,sortIndex,dataType,sortLoopInterval;
 
 function sortTable(table,sortIndex,isnumber,baseName,element) {  
     if(sorting){
-        alert()
+        alert("Sort Error")
     }else{
         try{
             lastElement[table.id].innerHTML=lastBaseName[table.id]
@@ -99,7 +99,7 @@ function sortTable(table,sortIndex,isnumber,baseName,element) {
         sorting = true;
         this.table=table
         this.sortIndex=sortIndex
-        this.isnumber=isnumber
+        dataType=isnumber
         while(sorting){
         //sortLoopInterval=setInterval(sortLoop,0)
         sortLoop()
@@ -112,25 +112,28 @@ function sortLoop(){
         shouldSwitch = false;
         x = rows[i].getElementsByTagName("TD")[sortIndex].innerHTML;
         y = rows[i + 1].getElementsByTagName("TD")[sortIndex].innerHTML;
-        var xPrefix
-        var yPrefix
+
         if(x.includes("$")){
             x=x.substr(1)
         }
         if(y.includes("$")){
             y=y.substr(1)
         }
-        if(isnumber){
-            if ((parseFloat(x) < parseFloat(y)&&!inverSort[table.id])||(parseFloat(x) > parseFloat(y)&&inverSort[table.id])) {
-                shouldSwitch = true;
-                break;
-            }
+        if(dataType==1){
+            y=parseFloat(y)
+            x=parseFloat(x)
+        }else if (dataType==2){
+            y=(new Date(y)).getTime()
+            x=(new Date(x)).getTime()
         }else{
-            if ((x.toLowerCase() < y.toLowerCase()&&inverSort[table.id])||(x.toLowerCase() > y.toLowerCase()&&!inverSort[table.id])) {
-                shouldSwitch = true;
-                break;
-            }
+            x=x.toLowerCase()
+            y=y.toLowerCase()
         }
+        if ((x < y&&inverSort[table.id])||(x > y&&!inverSort[table.id])) {
+            shouldSwitch = true;
+            break;
+        }
+        
     }
     if (shouldSwitch) {
         rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);

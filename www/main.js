@@ -26,11 +26,19 @@ for (var x = 0; x < 2; x++) {
   endDate[x].value = unixToYYYYMMDD(new Date().getTime() + oneDay * 1000);
 }
 socket.addEventListener("error", function (event) {
+  try{
+    alert("websocket Error Code: "+evt.code);
+  }catch(e){
+
+  }
   alert("websocket Error: "+evt.data);
   pagelable.innerText=evt.data
   console.log(event);
 });
-socket.addEventListener("open", function (event) {
+websocket.onclose = function (event) {
+  alert("websocket Error Code: "+event.code);
+}
+  socket.addEventListener("open", function (event) {
   socket.send('{"action":"getbalance","echo":"balance"}');
   socket.send('{"action":"getstarttime","echo":"starttime"}');
   socket.send('{"action":"getidmap","echo":"idmap"}');

@@ -18,7 +18,7 @@ const server = http.createServer((req, res) => {
         filePath="./www/"
     }
     if (filePath == './www/'){
-        filePath = './www/HoneyGainDevicesDelta_plot.html';
+        filePath = getConfig("enableDashboard")?'./www/dashboard.html':'./www/HoneyGainDevicesDelta_plot.html';
     }
     var extname = path.extname(filePath);
     var contentType = 'text/html';

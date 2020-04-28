@@ -26,8 +26,8 @@ for (var x = 0; x < 2; x++) {
   endDate[x].value = unixToYYYYMMDD(new Date().getTime() + oneDay * 1000);
 }
 socket.addEventListener("error", function (event) {
-  alert("websocket Error: "+event);
-  pagelable.innerText="websocket Error: "+event
+  alert("websocket Error: "+JSON.stringify(event));
+  pagelable.innerText=event
   console.log(event);
 });
 socket.addEventListener("open", function (event) {

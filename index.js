@@ -345,6 +345,7 @@ async function getDevices(pageNum){
         genGraph();
     }
 }
+var splitTransactionArray
 async function getTransactions(pageNum,inArray){
     var res=await sendRequest('https://dashboard.honeygain.com/api/v1/transactions?page='+pageNum)
     var resJson=JSON.parse(res)
@@ -353,6 +354,7 @@ async function getTransactions(pageNum,inArray){
     var totalItems=resJson.meta.pagination.total_items
     var transactionsArray=[]
     if(pageNum==1){
+        splitTransactionArray=false
         try{
             transactionsArray=JSON.parse(await ReadFile('transactions.json','[]'))
         }catch{
@@ -367,12 +369,33 @@ async function getTransactions(pageNum,inArray){
         }
         return
     }
+    if(totalItems<transactionsArray.length&&pageNum==1){
+        if(debug){
+            console.log("totalItems length to high resetting transactions")
+        }
+        transactionsArray=[]
+    }
     resArray.reverse()
     var index=0
     for(var newData of resArray){
-        if(transactionsArray.indexOf(newData)==-1&&index==0){
+        var found=-1
+        for(var aIndex in transactionsArray){
+            if(transactionsArray[aIndex].id==newData.id){
+                found=aIndex
+            }
+        }
+        if(found==-1&&index==0){
             if(pageNum<totalPages){
                 transactionsArray=await getTransactions(pageNum+1,transactionsArray)
+            }
+        }
+        if(!splitTransactionArray){
+            if(found>-1){
+                splitTransactionArray=true
+                transactionsArray.splice(found)
+            }else if(pageNum>=totalPages){
+                splitTransactionArray=true
+                transactionsArray=[]
             }
         }
         transactionsArray.push(newData)

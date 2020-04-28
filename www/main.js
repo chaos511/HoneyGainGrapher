@@ -35,7 +35,7 @@ socket.addEventListener("error", function (event) {
   pagelable.innerText=evt.data
   console.log(event);
 });
-websocket.onclose = function (event) {
+socket.onclose = function (event) {
   alert("websocket Error Code: "+event.code);
 }
   socket.addEventListener("open", function (event) {

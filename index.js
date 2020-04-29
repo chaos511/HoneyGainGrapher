@@ -45,7 +45,6 @@ const server = http.createServer(async (req, res) => {
     if(filePath.split('?')[0]=="./www/dashboard/getdata"){
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
-        console.log(query)
         var responseText="{Error:No action Defined}"
         if(query!=undefined&&query.action!=undefined){
             switch(query.action){

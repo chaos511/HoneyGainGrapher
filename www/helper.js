@@ -6,7 +6,6 @@ function unixToYYYYMMDD(unixtime){
     if(mm<10){mm='0'+mm} 
     return date.getFullYear()+'-'+mm+'-'+dd;
 }
-
 function exportToCsv(table){
     var rows=Array.from(table.querySelectorAll("tr"))
     var longest= findLongestRowLength(rows)

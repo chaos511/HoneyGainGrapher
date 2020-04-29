@@ -25,27 +25,14 @@ for (var x = 0; x < 2; x++) {
   endDate[x].max = unixToYYYYMMDD(new Date().getTime() + oneDay * 1000);
   endDate[x].value = unixToYYYYMMDD(new Date().getTime() + oneDay * 1000);
 }
-socket.addEventListener("error", function (event) {
-  try{
-    alert("websocket Error Code: "+evt.code);
-  }catch(e){
 
-  }
-  alert("websocket Error: "+evt.data);
-  pagelable.innerText=evt.data
-  console.log(event);
-});
-socket.onclose = function (event) {
-  alert("websocket Error Code: "+event.code);
-}
-  socket.addEventListener("open", function (event) {
-  socket.send('{"action":"getbalance","echo":"balance"}');
-  socket.send('{"action":"getstarttime","echo":"starttime"}');
-  socket.send('{"action":"getidmap","echo":"idmap"}');
-  onDateChangeTrans(startDateTrans.value,endDateTrans.value)
-});
-socket.addEventListener("message", function (event) {
-  jsonData = JSON.parse(event.data);
+getData({ action: "getbalance", echo: "balance" });
+getData({ action: "getstarttime", echo: "starttime" });
+getData({ action: "getidmap", echo: "idmap" });
+onDateChangeTrans(startDateTrans.value, endDateTrans.value);
+
+function parseRes(res) {
+  jsonData = JSON.parse(res);
   if (jsonData.echo == "balance") {
     if (
       jsonData.req.data.payout != undefined &&
@@ -60,22 +47,23 @@ socket.addEventListener("message", function (event) {
       jsonData.req.data.payout != undefined &&
       jsonData.req.data.payout.usd_cents != undefined
     ) {
-      currentBalanceUSD.innerText = '$'+jsonData.req.data.payout.usd_cents / 100;
+      currentBalanceUSD.innerText =
+        "$" + jsonData.req.data.payout.usd_cents / 100;
       balUSD = jsonData.req.data.payout.usd_cents / 100;
       calcNextPayout();
     }
   }
   if (jsonData.echo == "sevenday") {
     last7initial = jsonData.balance;
-    socket.send('{"action":"getdevicebalance","time":"now","echo":"now"}');
+    getData({ action: "getdevicebalance", time: "now", echo: "now" });
   }
   if (jsonData.echo == "enddate") {
     deviceBalanceEnd = jsonData.balance;
-    socket.send(
-      '{"action":"getdevicebalance","starttime":' +
-        new Date(startDateVal).getTime() / 1000 +
-        ',"echo":"deviceoverview"}'
-    );
+    getData({
+      action: "getdevicebalance",
+      starttime: new Date(startDateVal).getTime() / 1000,
+      echo: "deviceoverview",
+    });
   }
   if (jsonData.echo == "now") {
     deviceBalance = jsonData.balance;
@@ -83,9 +71,9 @@ socket.addEventListener("message", function (event) {
     for (x in last7initial) {
       last7Total += deviceBalance[x].credits - last7initial[x];
       last7Balance.innerText = last7Total.toFixed(2);
-      last7BalanceUSD.innerText = '$'+(last7Total / 1000).toFixed(2);
+      last7BalanceUSD.innerText = "$" + (last7Total / 1000).toFixed(2);
       last7BalanceGB.innerText = (last7Total / 100).toFixed(2);
-      last7Rate.innerText = '$'+(last7Total / 1000 / 7).toFixed(2);
+      last7Rate.innerText = "$" + (last7Total / 1000 / 7).toFixed(2);
     }
     calcNextPayout();
   }
@@ -101,65 +89,84 @@ socket.addEventListener("message", function (event) {
   }
   if (jsonData.echo == "idmap") {
     idMap = jsonData.idmap;
-    socket.send(
-      '{"action":"getdevicebalance","starttime":' +
-        (new Date().getTime() / 1000 - sevenDay) +
-        ',"echo":"sevenday"}'
-    );
+    getData({
+      action: "getdevicebalance",
+      starttime: new Date().getTime() / 1000 - sevenDay,
+      echo: "sevenday",
+    });
   }
   if (jsonData.echo == "transactions") {
     transactions = jsonData.transactions;
     updateTransactionTable();
   }
   console.log("message: ", jsonData);
-});
+}
 function updateTransactionTable() {
-  var gatheredAmountNum=0
-  var payoutAmountNum=0
+  var gatheredAmountNum = 0;
+  var payoutAmountNum = 0;
   var len = transactionOverviewTable.rows.length - 1;
   for (var x = 0; x < len; x++) {
     transactionOverviewTable.deleteRow(1);
   }
   for (var transaction of transactions) {
     var transactionRow = transactionOverviewTable.insertRow(1);
-    var typeMap={
-      "earnings":{"displayName":"Gathered","show":[1,1,0,0,0]},
-      "payout_reservation":{"displayName":"Payout Reservation","show":[1,0,1,0,0]},
-      "payout":{"displayName":"Payout","show":[1,0,1,0,0]},
-      "payout_reservation_return":{"displayName":"Payout Reservation Return","show":[1,0,1,0,0]},
-      "coupon":{"displayName":"Coupon","show":[1,0,0,1,0]},
-      "referral":{"displayName":"Referral","show":[1,0,0,0,1]},
-      
-    }
-    
-    transactionRow.transaction=transaction
-    transactionRow.onclick=function(){
-      showTransactionDetails(this.transaction)
-    }
-    transactionRow.insertCell(0).innerText = typeMap[transaction.type]?typeMap[transaction.type].displayName:transaction.type;
-    if(typeMap[transaction.type]){
-      transactionRow.style = typeMap[transaction.type].show[transactionsDisplayMode.selectedIndex]==0?"display:none;":""
-    }
-    transactionRow.insertCell(1).innerText = transaction.amount_credits
-    transactionRow.insertCell(2).innerText = "$"+(transaction.amount_usd_cents/100).toFixed(2)
+    var typeMap = {
+      earnings: { displayName: "Gathered", show: [1, 1, 0, 0, 0] },
+      payout_reservation: {
+        displayName: "Payout Reservation",
+        show: [1, 0, 1, 0, 0],
+      },
+      payout: { displayName: "Payout", show: [1, 0, 1, 0, 0] },
+      payout_reservation_return: {
+        displayName: "Payout Reservation Return",
+        show: [1, 0, 1, 0, 0],
+      },
+      coupon: { displayName: "Coupon", show: [1, 0, 0, 1, 0] },
+      referral: { displayName: "Referral", show: [1, 0, 0, 0, 1] },
+    };
 
-    if(transaction.type=="earnings"){
-      gatheredAmountNum=(parseFloat(gatheredAmountNum)+parseFloat(transaction.amount_usd_cents)/100).toFixed(2)
+    transactionRow.transaction = transaction;
+    transactionRow.onclick = function () {
+      showTransactionDetails(this.transaction);
+    };
+    transactionRow.insertCell(0).innerText = typeMap[transaction.type]
+      ? typeMap[transaction.type].displayName
+      : transaction.type;
+    if (typeMap[transaction.type]) {
+      transactionRow.style =
+        typeMap[transaction.type].show[transactionsDisplayMode.selectedIndex] ==
+        0
+          ? "display:none;"
+          : "";
     }
-    if(transaction.type=="payout_reservation"||transaction.type=="payout"||transaction.type=="payout_reservation_return"){
-      payoutAmountNum=(parseFloat(payoutAmountNum)+parseFloat(transaction.amount_usd_cents)/100).toFixed(2)
+    transactionRow.insertCell(1).innerText = transaction.amount_credits;
+    transactionRow.insertCell(2).innerText =
+      "$" + (transaction.amount_usd_cents / 100).toFixed(2);
+
+    if (transaction.type == "earnings") {
+      gatheredAmountNum = (
+        parseFloat(gatheredAmountNum) +
+        parseFloat(transaction.amount_usd_cents) / 100
+      ).toFixed(2);
     }
-    console.log(gatheredAmountNum)
-    transactionRow.insertCell(3).innerText = transaction.created_at
+    if (
+      transaction.type == "payout_reservation" ||
+      transaction.type == "payout" ||
+      transaction.type == "payout_reservation_return"
+    ) {
+      payoutAmountNum = (
+        parseFloat(payoutAmountNum) +
+        parseFloat(transaction.amount_usd_cents) / 100
+      ).toFixed(2);
+    }
+    console.log(gatheredAmountNum);
+    transactionRow.insertCell(3).innerText = transaction.created_at;
   }
-  console.log(gatheredAmountNum)
-  gatheredAmount.innerText='$'+gatheredAmountNum
-  payoutAmount.innerText='$'+Math.abs(payoutAmountNum)
-
+  console.log(gatheredAmountNum);
+  gatheredAmount.innerText = "$" + gatheredAmountNum;
+  payoutAmount.innerText = "$" + Math.abs(payoutAmountNum);
 }
-function showTransactionDetails(){
-
-}
+function showTransactionDetails() {}
 function updateTables() {
   userDevices = {};
   userData = {};
@@ -270,7 +277,9 @@ function updateTables() {
     lastEarningCell.style =
       thisLastEarning >= 24 ? "background-color: #ff0000;" : "";
     //display mode hide not earning
-    console.log((deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2))
+    console.log(
+      (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2)
+    );
     if (
       deviceDisplayMode.selectedIndex == 3 &&
       (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2) == 0
@@ -405,23 +414,40 @@ function onDateChange(sdate, edate) {
   startDate[1].value = startDateVal;
   endDate[0].value = endDateVal;
   endDate[1].value = endDateVal;
-  socket.send(
-    '{"action":"getdevicebalance","endtime":' +
-      new Date(endDateVal).getTime() / 1000 +
-      ',"echo":"enddate"}'
-  );
+  getData({
+    action: "getdevicebalance",
+    endtime: new Date(endDateVal).getTime() / 1000,
+    echo: "enddate",
+  });
   activeDevices.innerText = "Loaging...";
   earningDevices.innerText = "Loaging...";
   console.log("onchange");
 }
 function onDateChangeTrans(sdate, edate) {
-  socket.send(
-    '{"action":"gettransactions","endtime":' +
-      new Date(edate).getTime() +
-      ',"starttime":' +
-      new Date(sdate).getTime() +
-      ',"echo":"transactions"}'
-  );
+  getData({
+    action: "gettransactions",
+    endtime: new Date(edate).getTime(),
+    starttime: new Date(sdate).getTime(),
+    echo: "transactions",
+  });
   console.log("onchange2");
 }
 window.onhashchange();
+
+function getData(data) {
+  var req = new XMLHttpRequest();
+  req.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      parseRes(req.responseText);
+    }
+  };
+  var queryString=''
+  for(var x in data){
+    queryString+=x+'='+data[x]
+    queryString+='&'
+  }
+  queryString=queryString.substr(0,queryString.length-1)
+  console.log(queryString)
+  req.open("GET", "/dashboard/getdata?"+queryString, true);
+  req.send();
+}

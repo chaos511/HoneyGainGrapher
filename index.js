@@ -2,15 +2,15 @@ const config = require('config');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
+const url = require('url');
 let {PythonShell} = require('python-shell')
 var path = require('path');
-const WebSocketServer = require('websocket').server;
 var numOfDevices=0;
 const debug=true;
 var count=0;
 var timestamp=-1;
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     var ip = req.headers['x-forwarded-for'] ||      req.connection.remoteAddress ||      req.socket.remoteAddress ||     (req.connection.socket ? req.connection.socket.remoteAddress : null);
     appendLog("http req: "+req.url+" From Ip address: "+ip)
     var filePath = './www' + decodeURI(req.url);
@@ -42,122 +42,104 @@ const server = http.createServer((req, res) => {
             contentType = 'audio/wav';
             break;
     }
-    fs.readFile(filePath, function(error, content) {
-        if (error) {
-            if(error.code == 'ENOENT'){
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end("Error 404: File "+filePath+" Not Found", 'utf-8');
+    if(filePath.split('?')[0]=="./www/dashboard/getdata"){
+        var url_parts = url.parse(req.url, true);
+        var query = url_parts.query;
+        console.log(query)
+        var responseText="{Error:No action Defined}"
+        if(query!=undefined&&query.action!=undefined){
+            switch(query.action){
+                case "getbalance":
+                    var x = await sendRequest("/api/v1/users/balances");
+                    responseText='{"req":'+x+',"echo":"'+query.echo+'"}'
+                break;
+                case "getdevicebalance":
+                    content=await wsReadFile("data.json")
+                    jsonData=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                    var retBal={}
+                    for (x in jsonData.dataFile){
+                        var date=jsonData.dataFile[x]['9']
+                        var id=jsonData.dataFile[x]['1']
+                        var credits=jsonData.dataFile[x]['8']
+                        if(query.time!="now"&&query.starttime!=undefined&&date>query.starttime){
+                            if(retBal[id]==undefined){
+                                retBal[id]=credits
+                            }
+                        }
+                        if(query.time!="now"&&query.endtime!=undefined&&date<query.endtime){
+                            retBal[id]={"credits":credits}
+                        }
+                        if(query.time=="now"){
+                            if(retBal[id]!=undefined){
+                                if(credits>retBal[id].credits){
+                                    retBal[id]={"credits":credits,"lastEarning":date}
+                                }
+                            }else{
+                                retBal[id]={"credits":credits,"lastEarning":date}
+                            }
+                        }
+                    }
+                    responseText='{"balance":'+JSON.stringify(retBal)+',"time":"'+(query.starttime||query.endtime)+'","echo":"'+query.echo+'"}'
+                break;
+                case "getstarttime":
+                    content=await wsReadFile("data.json")
+                    jsonData=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
+                    var retTime=(new Date()).getTime()/1000
+                    for (x in jsonData.dataFile){
+                        retTime=Math.min(retTime,jsonData.dataFile[x]['9'])                                    
+                    }
+                    responseText='{"time":"'+retTime+'","echo":"'+query.echo+'"}'
+                break;
+                case "getdata":
+                    content=await wsReadFile("data.json")
+                    responseText='{"dataFile":['+content.slice(0,-2)+'],"echo":"'+query.echo+'"}'
+                break;
+                case "getidmap":
+                    content=await wsReadFile("idmap.json")
+                    responseText='{"idmap":'+content+',"echo":"'+query.echo+'"}'
+                break;
+                case "gettransactions":
+                    getTransactions(1)
+                    try{
+                        transactionsArray=JSON.parse(await ReadFile('transactions.json','[]'))
+                    }catch{
+                        console.log('Cannot Parse File: transactions.json')
+                    }                       
+                    var retData=[]
+                    for (var transaction of transactionsArray){
+                        var transactionDate=(new Date(transaction.created_at)).getTime()
+                        if(transactionDate>query.starttime&&transactionDate<query.endtime){
+                            retData.push(transaction)
+                        }
+                    }
+                    responseText='{"transactions":'+JSON.stringify(retData)+',"echo":"'+query.echo+'"}'
+                break;
+            }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json'});
+        res.end(responseText, 'utf-8');
+    }else{
+        fs.readFile(filePath, function(error, content) {
+            if (error) {
+                if(error.code == 'ENOENT'){
+                    res.writeHead(404, { 'Content-Type': 'text/plain' });
+                    res.end("Error 404: File "+filePath+" Not Found", 'utf-8');
+                }
+                else {
+                    res.writeHead(500);
+                    res.end('check with the site admin for error: '+error.code+' ..\n');
+                    res.end(); 
+                }
             }
             else {
-                res.writeHead(500);
-                res.end('check with the site admin for error: '+error.code+' ..\n');
-                res.end(); 
+                res.writeHead(200, { 'Content-Type': contentType});
+                res.end(content, 'utf-8');
             }
-        }
-        else {
-            res.writeHead(200, { 'Content-Type': contentType});
-            res.end(content, 'utf-8');
-        }
-    });
+        });
+    }
 });
 server.listen(getConfig("webserverPort"),getConfig("webserverHost"), (h,p) => {
     console.log("Server running at http://"+getConfig("webserverHost")+":"+getConfig("webserverPort")+"");
-});
-
-wsServer = new WebSocketServer({
-    httpServer: server,
-    autoAcceptConnections: false
-});
-wsServer.on('request', function(request) {
-    var connection = request.accept(null, null);
-    if(debug){
-        appendLog((new Date()) + ' Connection accepted.');
-    }
-    connection.on('message', async function(message) {
-        if (message.type === 'utf8') {
-            if(debug){
-                appendLog('Received Message: ' +message.utf8Data);
-            }
-            var jsonMessage
-            try{
-                jsonMessage=JSON.parse(message.utf8Data)
-            }catch(ignored){
-                appendLog("Unable to parse: "+message.utf8Data)
-            }
-            if(jsonMessage!=undefined&&jsonMessage.action!=undefined){
-                switch(jsonMessage.action){
-                    case "getbalance":
-                        var x = await sendRequest("/api/v1/users/balances");
-                        connection.sendUTF('{"req":'+x+',"echo":"'+jsonMessage.echo+'"}')
-                    break;
-                    case "getdevicebalance":
-                        content=await wsReadFile("data.json")
-                        jsonData=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
-                        var retBal={}
-                        for (x in jsonData.dataFile){
-                            var date=jsonData.dataFile[x]['9']
-                            var id=jsonData.dataFile[x]['1']
-                            var credits=jsonData.dataFile[x]['8']
-                            if(jsonMessage.time!="now"&&jsonMessage.starttime!=undefined&&date>jsonMessage.starttime){
-                                if(retBal[id]==undefined){
-                                    retBal[id]=credits
-                                }
-                            }
-                            if(jsonMessage.time!="now"&&jsonMessage.endtime!=undefined&&date<jsonMessage.endtime){
-                                retBal[id]={"credits":credits}
-                            }
-                            if(jsonMessage.time=="now"){
-                                if(retBal[id]!=undefined){
-                                    if(credits>retBal[id].credits){
-                                        retBal[id]={"credits":credits,"lastEarning":date}
-                                    }
-                                }else{
-                                    retBal[id]={"credits":credits,"lastEarning":date}
-                                }
-                            }
-                        }
-                        connection.sendUTF('{"balance":'+JSON.stringify(retBal)+',"time":"'+(jsonMessage.starttime||jsonMessage.endtime)+'","echo":"'+jsonMessage.echo+'"}');
-                    break;
-                    case "getstarttime":
-                        content=await wsReadFile("data.json")
-                        jsonData=JSON.parse('{"dataFile":['+content.slice(0,-2)+']}')
-                        var retTime=(new Date()).getTime()/1000
-                        for (x in jsonData.dataFile){
-                            retTime=Math.min(retTime,jsonData.dataFile[x]['9'])                                    
-                        }
-                        connection.sendUTF('{"time":"'+retTime+'","echo":"'+jsonMessage.echo+'"}');
-                    break;
-                    case "getdata":
-                        content=await wsReadFile("data.json")
-                        connection.sendUTF('{"dataFile":['+content.slice(0,-2)+'],"echo":"'+jsonMessage.echo+'"}');
-                    break;
-                    case "getidmap":
-                        content=await wsReadFile("idmap.json")
-                        connection.sendUTF('{"idmap":'+content+',"echo":"'+jsonMessage.echo+'"}');
-                    break;
-                    case "gettransactions":
-                        getTransactions(1)
-                        try{
-                            transactionsArray=JSON.parse(await ReadFile('transactions.json','[]'))
-                        }catch{
-                            console.log('Cannot Parse File: transactions.json')
-                        }                       
-                        var retData=[]
-                        for (var transaction of transactionsArray){
-                            var transactionDate=(new Date(transaction.created_at)).getTime()
-                            if(transactionDate>jsonMessage.starttime&&transactionDate<jsonMessage.endtime){
-                                retData.push(transaction)
-                            }
-                        }
-                        connection.sendUTF('{"transactions":'+JSON.stringify(retData)+',"echo":"'+jsonMessage.echo+'"}');
-                    break;
-                }
-            }
-        }
-    });
-    connection.on('close', function(reasonCode, description) {
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
-    });
 });
 
 function wsReadFile(fPath){

@@ -93,6 +93,10 @@ const server = http.createServer(async (req, res) => {
                     content=await wsReadFile("data.json")
                     responseText='{"dataFile":['+content.slice(0,-2)+'],"echo":"'+query.echo+'"}'
                 break;
+                case "getlastbalance":
+                    content=await wsReadFile("lastbalance.json")
+                    responseText='{"req":'+content+',"echo":"'+query.echo+'"}'
+                break;
                 case "getidmap":
                     content=await wsReadFile("idmap.json")
                     responseText='{"idmap":'+content+',"echo":"'+query.echo+'"}'
@@ -399,7 +403,14 @@ async function getTransactions(pageNum,inArray){
         return transactionsArray
     }
 }
-
+async function getBalance(){
+    content=await sendRequest("/api/v1/users/balances");
+    fs.writeFile("lastbalance.json", content, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+    }); 
+}
 function main(){
     getNumOfDevices()
     getDevices(1)
@@ -413,5 +424,4 @@ var passedIntervals=parseInt(((new Date).getMinutes()*60+(new Date).getSeconds()
 var nextIntervalTime=(passedIntervals+1)*getConfig("pingInterval")
 var secondsToNextInterval=nextIntervalTime-((new Date).getMinutes()*60+(new Date).getSeconds())
 setTimeout(init,secondsToNextInterval*1000)
-// main()
 getTransactions(1)

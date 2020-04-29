@@ -38,7 +38,7 @@ body{
     position: absolute;
     top:  75px;
     width: 300px;
-    height: 500px;
+    height: 550px;
     margin: auto;
     border: 3px solid wheat;
     left: 20px;
@@ -48,7 +48,27 @@ body{
     position: absolute;
     top:  75px;
     width: 300px;
-    height: 500px;
+    height: 550px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 340px;
+}
+.card2_sub1{
+    background-color: #303030;
+    position: absolute;
+    top:  75px;
+    width: 300px;
+    height: 225px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 340px;
+}
+.card2_sub2{
+    background-color: #303030;
+    position: absolute;
+    top:  325px;
+    width: 300px;
+    height: 300px;
     margin: auto;
     border: 3px solid wheat;
     left: 340px;
@@ -58,7 +78,7 @@ body{
     position: absolute;
     top:  75px;
     width: 300px;
-    height: 500px;
+    height: 550px;
     margin: auto;
     border: 3px solid wheat;
     left: 660px;

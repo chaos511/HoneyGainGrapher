@@ -6,6 +6,7 @@ var oneDay = 1 * 24 * 60 * 60;
 var last7Total = 0;
 var nowReceived = false;
 var balUSD;
+var balRealtime
 var sidebarWidth = 0;
 var last7initial = {};
 var deviceBalance = {};
@@ -34,23 +35,27 @@ function parseRes(res) {
   jsonData = JSON.parse(res);
   if (jsonData.echo == "balance") {
     if (
-      jsonData.req.data.payout != undefined &&
-      jsonData.req.data.payout.credits != undefined
-    ) {
+      jsonData.req.data.payout != undefined) {
+      balCredits=jsonData.req.data.payout.credits
       currentBalance.innerText = jsonData.req.data.payout.credits;
       currentBalanceGB.innerText = (
         jsonData.req.data.payout.credits / 100
       ).toFixed(2);
-    }
-    if (
-      jsonData.req.data.payout != undefined &&
-      jsonData.req.data.payout.usd_cents != undefined
-    ) {
       currentBalanceUSD.innerText =
         "$" + jsonData.req.data.payout.usd_cents / 100;
       balUSD = jsonData.req.data.payout.usd_cents / 100;
       calcNextPayout();
+      balRealtime=jsonData.req.data.realtime.credits
+      getData({ action: "getlastbalance", echo: "lastbalance" });
     }
+  }
+  if(jsonData.echo=="lastbalance"){
+    var diffBal=balRealtime-jsonData.req.data.realtime.credits
+    if(diffBal<0){
+      diffBal=balRealtime
+    }
+    last24BalanceUSD.innerText='$'+(diffBal/1000).toFixed(2)
+    last24Balance.innerText=diffBal.toFixed(2)
   }
   if (jsonData.echo == "sevenday") {
     last7initial = jsonData.balance;
@@ -71,7 +76,7 @@ function parseRes(res) {
       last7Total += deviceBalance[x].credits - last7initial[x];
       last7Balance.innerText = last7Total.toFixed(2);
       last7BalanceUSD.innerText = "$" + (last7Total / 1000).toFixed(2);
-      last7BalanceGB.innerText = (last7Total / 100).toFixed(2);
+      //last7BalanceGB.innerText = (last7Total / 100).toFixed(2);
       last7Rate.innerText = "$" + (last7Total / 1000 / 7).toFixed(2);
     }
     calcNextPayout();
@@ -158,10 +163,8 @@ function updateTransactionTable() {
         parseFloat(transaction.amount_usd_cents) / 100
       ).toFixed(2);
     }
-    console.log(gatheredAmountNum);
     transactionRow.insertCell(3).innerText = transaction.created_at;
   }
-  console.log(gatheredAmountNum);
   gatheredAmount.innerText = "$" + gatheredAmountNum;
   payoutAmount.innerText = "$" + Math.abs(payoutAmountNum);
 }
@@ -276,9 +279,6 @@ function updateTables() {
     lastEarningCell.style =
       thisLastEarning >= 24 ? "background-color: #ff0000;" : "";
     //display mode hide not earning
-    console.log(
-      (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2)
-    );
     if (
       deviceDisplayMode.selectedIndex == 3 &&
       (deviceBalanceEnd[id].credits - deviceOverviewInitial[id]).toFixed(2) == 0
@@ -420,7 +420,6 @@ function onDateChange(sdate, edate) {
   });
   activeDevices.innerText = "Loaging...";
   earningDevices.innerText = "Loaging...";
-  console.log("onchange");
 }
 function onDateChangeTrans(sdate, edate) {
   getData({
@@ -429,7 +428,6 @@ function onDateChangeTrans(sdate, edate) {
     starttime: new Date(sdate).getTime(),
     echo: "transactions",
   });
-  console.log("onchange2");
 }
 window.onhashchange();
 

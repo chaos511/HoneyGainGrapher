@@ -45,3 +45,4 @@ v1.15.1 Change WS type to null
 v1.15.2 Accept all ws connections
 v1.16.0 Change all usage of webSockets to http get requests
 v1.16.1 Add v param to scripts for cache control
+v1.17.0 Add last hour earnings to overview page

@@ -9,3 +9,4 @@ latest.log
 package-lock.json
 idmap.json
 transactions.json
+lastbalance.json

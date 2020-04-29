@@ -1,7 +1,6 @@
 var idMap = {};
 var userDevices = {};
 var userData = {};
-const socket = new WebSocket("ws://" + document.location.host);
 var sevenDay = 7 * 24 * 60 * 60;
 var oneDay = 1 * 24 * 60 * 60;
 var last7Total = 0;

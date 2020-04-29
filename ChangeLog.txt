@@ -47,3 +47,4 @@ v1.16.0 Change all usage of webSockets to http get requests
 v1.16.1 Add v param to scripts for cache control
 v1.17.0 Add last hour earnings to overview page
 v1.17.1 Add v param to styleSheet for cache control
+v1.17.2 Enable get balance

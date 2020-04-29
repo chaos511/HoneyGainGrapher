@@ -415,6 +415,7 @@ function main(){
     getNumOfDevices()
     getDevices(1)
     getTransactions(1)
+    getBalance()
 }
 function init(){
     setInterval(main,getConfig("pingInterval")*1000) 

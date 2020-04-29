@@ -426,3 +426,8 @@ var nextIntervalTime=(passedIntervals+1)*getConfig("pingInterval")
 var secondsToNextInterval=nextIntervalTime-((new Date).getMinutes()*60+(new Date).getSeconds())
 setTimeout(init,secondsToNextInterval*1000)
 getTransactions(1)
+fs.readFile("lastbalance.json", function(error, content) {
+    if (error) {
+        getBalance()
+    }
+});

@@ -66,10 +66,10 @@ server.listen(getConfig("webserverPort"),getConfig("webserverHost"), (h,p) => {
 
 wsServer = new WebSocketServer({
     httpServer: server,
-    autoAcceptConnections: false
+    autoAcceptConnections: true
 });
 wsServer.on('request', function(request) {
-    var connection = request.accept(null, request.origin);
+    var connection = request.accept();
     if(debug){
         appendLog((new Date()) + ' Connection accepted.');
     }

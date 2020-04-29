@@ -13,7 +13,7 @@ var timestamp=-1;
 const server = http.createServer(async (req, res) => {
     var ip = req.headers['x-forwarded-for'] ||      req.connection.remoteAddress ||      req.socket.remoteAddress ||     (req.connection.socket ? req.connection.socket.remoteAddress : null);
     appendLog("http req: "+req.url+" From Ip address: "+ip)
-    var filePath = './www' + decodeURI(req.url);
+    var filePath = './www' + decodeURI(req.url).split('?')[0];
     if(filePath.includes("dashboard")&&!getConfig("enableDashboard")){
         filePath="./www/"
     }
@@ -42,7 +42,7 @@ const server = http.createServer(async (req, res) => {
             contentType = 'audio/wav';
             break;
     }
-    if(filePath.split('?')[0]=="./www/dashboard/getdata"){
+    if(filePath=="./www/dashboard/getdata"){
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
         var responseText="{Error:No action Defined}"

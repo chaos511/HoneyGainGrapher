@@ -150,7 +150,7 @@ function wsReadFile(fPath){
         fs.readFile(fPath, function(error, content) {
             if (error) {
                 if(error.code == 'ENOENT'){
-                    connection.sendUTF("Error 404: File "+fPath+" Not Found");
+                    //connection.sendUTF("Error 404: File "+fPath+" Not Found");
                     appendLog("Error 404: File "+fPath+" Not Found")
                 }
                 resolve(undefined)

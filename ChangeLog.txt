@@ -41,3 +41,4 @@ v1.14.4 Rename selector Only Payout from Only Payout Reservation
 v1.14.5 Include payout_reservation_return in total payout calculation
 v1.14.6 Fix transaction showing multiple times and add more info to ws error screen
 v1.15.0 make dashboard the default web page
+v1.15.1 Change WS type to null

@@ -69,7 +69,7 @@ wsServer = new WebSocketServer({
     autoAcceptConnections: false
 });
 wsServer.on('request', function(request) {
-    var connection = request.accept('echo-protocol', request.origin);
+    var connection = request.accept(null, request.origin);
     if(debug){
         appendLog((new Date()) + ' Connection accepted.');
     }

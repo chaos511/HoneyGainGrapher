@@ -21,6 +21,7 @@
   Supports Multipage Active Devices lists(more than 10 devices)<br>
   Dashboard with Current balance, previus earnings, and next estimated payout<br>
   Pool mode where multiple devices can summed into one user<br>
+  TODO: Add support for ssl <br>
   TODO: Add support for password login<br>
   TODO: Drops sample points when data is older than x days to save space<br>
   TODO: Add compression to http server<br>

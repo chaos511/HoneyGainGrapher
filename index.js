@@ -334,7 +334,7 @@ async function getDevices(pageNum){
     if(pageNum<numOfDevices/10){
         console.log("Pagenum: "+pageNum)
         pageNum++;
-      getDevices(pageNum+1);
+      getDevices(pageNum);
     }else if (getConfig("enableGraph")){
         genGraph();
     }

@@ -52,3 +52,4 @@ v1.17.3 Fix graph showing incorrect values when sample points are not one hour a
 v1.18.0 Add support for https
 v1.18.1 Fix skipping page two of devices
 v1.18.2 Change font to Monda
+v1.18.3 Change overview layout

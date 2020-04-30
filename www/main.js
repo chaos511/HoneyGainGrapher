@@ -37,10 +37,10 @@ function parseRes(res) {
     if (
       jsonData.req.data.payout != undefined) {
       balCredits=jsonData.req.data.payout.credits
-      currentBalance.innerText = jsonData.req.data.payout.credits;
-      currentBalanceGB.innerText = (
+      currentBalance.innerHTML = jsonData.req.data.payout.credits+'<font size="5"> Credits</font>';
+      currentBalanceGB.innerHTML = (
         jsonData.req.data.payout.credits / 100
-      ).toFixed(2);
+      ).toFixed(2)+'<font size="5"> GB</font>';
       currentBalanceUSD.innerText =
         "$" + jsonData.req.data.payout.usd_cents / 100;
       balUSD = jsonData.req.data.payout.usd_cents / 100;
@@ -55,7 +55,7 @@ function parseRes(res) {
       diffBal=balRealtime
     }
     last24BalanceUSD.innerText='$'+(diffBal/1000).toFixed(2)
-    last24Balance.innerText=diffBal.toFixed(2)
+    last24Balance.innerHTML=diffBal.toFixed(2)+'<font size="5"> Credits</font>'
   }
   if (jsonData.echo == "sevenday") {
     last7initial = jsonData.balance;
@@ -74,7 +74,7 @@ function parseRes(res) {
     nowReceived = true;
     for (x in last7initial) {
       last7Total += deviceBalance[x].credits - last7initial[x];
-      last7Balance.innerText = last7Total.toFixed(2);
+      last7Balance.innerHTML = last7Total.toFixed(2)+'<font size="5"> Credits</font>';
       last7BalanceUSD.innerText = "$" + (last7Total / 1000).toFixed(2);
       //last7BalanceGB.innerText = (last7Total / 100).toFixed(2);
       last7Rate.innerText = "$" + (last7Total / 1000 / 7).toFixed(2);
@@ -342,10 +342,10 @@ function updateTables() {
 }
 function calcNextPayout() {
   if (balUSD != undefined && nowReceived) {
-    nextPayout.innerText = Math.max(
+    nextPayout.innerHTML= Math.max(
       ((7 / (last7Total / 1000)) * (20 - balUSD)).toFixed(2),
       0
-    );
+    )+'<font size="5"> Days</font>';
     startDate[0].onchange();
   }
 }

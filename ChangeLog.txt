@@ -51,3 +51,4 @@ v1.17.2 Enable get balance
 v1.17.3 Fix graph showing incorrect values when sample points are not one hour apart
 v1.18.0 Add support for https
 v1.18.1 Fix skipping page two of devices
+v1.18.2 Change font to Monda

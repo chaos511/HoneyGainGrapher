@@ -49,3 +49,4 @@ v1.17.0 Add last hour earnings to overview page
 v1.17.1 Add v param to styleSheet for cache control
 v1.17.2 Enable get balance
 v1.17.3 Fix graph showing incorrect values when sample points are not one hour apart
+v1.18.0 Add support for https

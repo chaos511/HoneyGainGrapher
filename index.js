@@ -10,7 +10,15 @@ const debug=true;
 var count=0;
 var timestamp=-1;
 
-const server = http.createServer(async (req, res) => {
+var serverOptions=null
+
+if (getConfig("enableHttps")) {
+    serverOptions={
+        key: fs.readFileSync('key.pem'),
+        cert: fs.readFileSync('cert.pem')
+    }
+}
+const server = http.createServer(null,async (req, res) => {
     var ip = req.headers['x-forwarded-for'] ||      req.connection.remoteAddress ||      req.socket.remoteAddress ||     (req.connection.socket ? req.connection.socket.remoteAddress : null);
     appendLog("http req: "+req.url+" From Ip address: "+ip)
     var filePath = './www' + decodeURI(req.url).split('?')[0];
@@ -251,7 +259,8 @@ function getConfig(keyName){
             "enableGraph":true,
             "useHTTPAuth":false,
             "webserverPort":80,
-            "webserverHost":"127.0.0.1"
+            "webserverHost":"127.0.0.1",
+            "enableHttps": false
         }
         if(defaultConfig[keyName]==undefined){
             Error(e);

@@ -103,7 +103,8 @@ const server = http.createServer(null,async (req, res) => {
                 break;
                 case "getlastbalance":
                     content=await wsReadFile("lastbalance.json")
-                    responseText='{"req":'+content+',"echo":"'+query.echo+'"}'
+                    content2=await ReadFile("lastlastbalance.json",content)
+                    responseText='{"req":'+content+',"req2":'+content2+',"echo":"'+query.echo+'"}'
                 break;
                 case "getidmap":
                     content=await wsReadFile("idmap.json")
@@ -413,8 +414,14 @@ async function getTransactions(pageNum,inArray){
     }
 }
 async function getBalance(){
-    content=await sendRequest("/api/v1/users/balances");
+    var content=await sendRequest("/api/v1/users/balances");
+    var lasBalance=await ReadFile("lastbalance.json",content)
     fs.writeFile("lastbalance.json", content, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+    }); 
+    fs.writeFile("lastlastbalance.json", lasBalance, function(err) {
         if(err) {
             return console.log(err);
         }

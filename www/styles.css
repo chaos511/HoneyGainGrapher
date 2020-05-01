@@ -43,6 +43,14 @@ body{
     border: 3px solid wheat;
     left: 20px;
 }
+.card1_sub2{
+    background-color: #303030;
+    position: absolute;
+    top:  380px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 20px;
+}
 .card2{
     background-color: #303030;
     position: absolute;
@@ -63,7 +71,7 @@ body{
 .card2_sub2{
     background-color: #303030;
     position: absolute;
-    top:  310px;
+    top:  430px;
     margin: auto;
     border: 3px solid wheat;
     left: 340px;
@@ -72,6 +80,14 @@ body{
     background-color: #303030;
     position: absolute;
     top:  75px;
+    margin: auto;
+    border: 3px solid wheat;
+    left: 660px;
+}
+.card3_sub2{
+    background-color: #303030;
+    position: absolute;
+    top:  310px;
     margin: auto;
     border: 3px solid wheat;
     left: 660px;
@@ -105,13 +121,16 @@ body{
 .innerCardLabel1{
     font-size: 180%;
     color: white;
+    padding-left: 10px;
 }
 .innerCardText1{
     font-size: 300%;
     color: white;
+    padding-left: 10px;
 }
 .innerCardText2{
     color: white;
+    padding-left: 10px;
 }
 
 .menuSidebar{

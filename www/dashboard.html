@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="styles.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 <div class="header"> 
@@ -26,6 +26,20 @@
         <div class="innerCardText1" id="currentBalance"> Loading...</div>
         <div class="innerCardText1" id="currentBalanceGB"> Loading...</div>
     </div>
+    <div class="card1_sub2" id="payoutCard">
+        <div class="cardLabel">Payout</div>
+        <div class="innerCardLabel1"> Last Payout:</div>
+        <div class="innerCardText1" id="lastPayout"> N/A</div>
+        <div class="innerCardLabel1"> Est. Next Payout: </div>
+        <div class="innerCardText1" id="nextPayout"> Loading...</div>
+    </div>
+    <div class="card2_sub1" id="lastHourCard">
+        <div class="cardLabel">Last Hour</div>
+        <div class="innerCardText1" id="lastHourBalanceUSD"> Loading...</div>
+        <div class="innerCardText1" id="lastHourBalance"> Loading...</div>
+        <div class="innerCardLabel1"> per Day:</div>
+        <div class="innerCardText1" id="lastHourRate"> Loading...</div>
+    </div>
     <div class="card2_sub2" id="last7Card">
         <div class="cardLabel">Last 7 Days</div>
         <div class="innerCardText1" id="last7BalanceUSD"> Loading...</div>
@@ -33,17 +47,17 @@
         <div class="innerCardLabel1"> per Day:</div>
         <div class="innerCardText1" id="last7Rate"> Loading...</div>
     </div>
-    <div class="card2_sub1" id="last24Card">
-        <div class="cardLabel">Last Hour</div>
-        <div class="innerCardText1" id="last24BalanceUSD"> Loading...</div>
-        <div class="innerCardText1" id="last24Balance"> Loading...</div>
+    <div class="card3" id="toHourCard">
+        <div class="cardLabel">Gathered This Hour</div>
+        <div class="innerCardText1" id="toHourBalanceUSD"> Loading...</div>
+        <div class="innerCardText1" id="toHourBalance"> Loading...</div>
     </div>
-    <div class="card3" id="payoutCard">
-        <div class="cardLabel">Payout</div>
-        <div class="innerCardLabel1"> Last Payout:</div>
-        <div class="innerCardText1" id="lastPayout"> N/A</div>
-        <div class="innerCardLabel1"> Est. bal>20: </div>
-        <div class="innerCardText1" id="nextPayout"> Loading...</div>
+    <div class="card3_sub2" id="toDayCard">
+        <div class="cardLabel">Gathered Today</div>
+        <div class="innerCardText1" id="toDayBalanceUSD"> Loading...</div>
+        <div class="innerCardText1" id="toDayBalance"> Loading...</div>
+        <div class="innerCardLabel1"> per Hour:</div>
+        <div class="innerCardText1" id="toDayRate"> Loading...</div>
     </div>
 </div>
 
@@ -180,5 +194,5 @@
 
 </body>
 </html>
-<script src="helper.js?v=0"></script>
-<script src="main.js?v=1"></script>
+<script src="helper.js?v=1"></script>
+<script src="main.js?v=2"></script>

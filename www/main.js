@@ -46,16 +46,24 @@ function parseRes(res) {
       balUSD = jsonData.req.data.payout.usd_cents / 100;
       calcNextPayout();
       balRealtime=jsonData.req.data.realtime.credits
+      toDayBalance.innerHTML=balRealtime.toFixed(2)+'<font size="5"> Credits</font>'
+      toDayBalanceUSD.innerHTML='$'+(balRealtime/1000).toFixed(2)
+      toDayRate.innerHTML='$'+(balRealtime/1000/getHoursFromMidnight()).toFixed(2)
       getData({ action: "getlastbalance", echo: "lastbalance" });
     }
   }
   if(jsonData.echo=="lastbalance"){
     var diffBal=balRealtime-jsonData.req.data.realtime.credits
+    var diffBal2=jsonData.req.data.realtime.credits-jsonData.req2.data.realtime.credits
+
     if(diffBal<0){
       diffBal=balRealtime
     }
-    last24BalanceUSD.innerText='$'+(diffBal/1000).toFixed(2)
-    last24Balance.innerHTML=diffBal.toFixed(2)+'<font size="5"> Credits</font>'
+    toHourBalanceUSD.innerText='$'+(diffBal/1000).toFixed(2)
+    toHourBalance.innerHTML=diffBal.toFixed(2)+'<font size="5"> Credits</font>'
+    lastHourBalanceUSD.innerText='$'+(diffBal2/1000).toFixed(2)
+    lastHourBalance.innerHTML=diffBal2.toFixed(2)+'<font size="5"> Credits</font>'
+    lastHourRate.innerHTML='$'+(diffBal2/1000*24).toFixed(2)
   }
   if (jsonData.echo == "sevenday") {
     last7initial = jsonData.balance;

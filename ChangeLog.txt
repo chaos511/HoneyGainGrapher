@@ -54,3 +54,4 @@ v1.18.1 Fix skipping page two of devices
 v1.18.2 Change font to Monda
 v1.18.3 Change overview layout
 v1.19.0 Add more stuff to overview page of the dashboard
+v1.19.1 Fix Last Hour showing negative at UTC 0:00

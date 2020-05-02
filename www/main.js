@@ -59,6 +59,9 @@ function parseRes(res) {
     if(diffBal<0){
       diffBal=balRealtime
     }
+    if(diffBal2<0){
+      diffBal2=jsonData.req.data.realtime.credits
+    }
     toHourBalanceUSD.innerText='$'+(diffBal/1000).toFixed(2)
     toHourBalance.innerHTML=diffBal.toFixed(2)+'<font size="5"> Credits</font>'
     lastHourBalanceUSD.innerText='$'+(diffBal2/1000).toFixed(2)

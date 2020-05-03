@@ -8,5 +8,6 @@
   "useHTTPAuth": false,
   "webserverPort": 80,
   "webserverHost": "127.0.0.1",
-  "enableHttps": false
+  "enableHttps": false,
+  "requireLogin":false
 }

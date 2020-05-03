@@ -50,6 +50,9 @@ const server = http.createServer(null,async (req, res) => {
             contentType = 'audio/wav';
             break;
     }
+    if(filePath!="./www/styles.css"&&false&&getConfig("requireLogin")){
+        filePath="./www/login.html"
+    }
     if(filePath=="./www/dashboard/getdata"){
         var url_parts = url.parse(req.url, true);
         var query = url_parts.query;
@@ -261,10 +264,11 @@ function getConfig(keyName){
             "useHTTPAuth":false,
             "webserverPort":80,
             "webserverHost":"127.0.0.1",
-            "enableHttps": false
+            "enableHttps": false,
+            "requireLogin":false
         }
         if(defaultConfig[keyName]==undefined){
-            Error(e);
+            throw Error(e);
         }else{
             value=defaultConfig[keyName];
             appendLog("Key: "+keyName+" Not found in config using default value: "+value);

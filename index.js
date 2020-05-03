@@ -299,11 +299,11 @@ async function getDevices(pageNum){
         if(idMap[jsonData[device].id]==undefined||idMap[jsonData[device].id].title!=encodeURI(jsonData[device].title)){
             var idmapData={
                 id:jsonData[device].id,
-                manufacturer:encodeURI(jsonData[device].manufacturer),
-                model:encodeURI(jsonData[device].model),
-                title:encodeURI(jsonData[device].title),
-                platform:encodeURI(jsonData[device].platform),
-                version:encodeURI(jsonData[device].version),
+                manufacturer:encodeURI(jsonData[device].manufacturer).replace(/'/g, "%27"),
+                model:encodeURI(jsonData[device].model).replace(/'/g, "%27"),
+                title:encodeURI(jsonData[device].title).replace(/'/g, "%27"),
+                platform:encodeURI(jsonData[device].platform).replace(/'/g, "%27"),
+                version:encodeURI(jsonData[device].version).replace(/'/g, "%27"),
             }
             if(debug){
                 appendLog("device not found or changed adding: "+JSON.stringify(idmapData))
@@ -327,7 +327,7 @@ async function getDevices(pageNum){
             }
         }); 
     }
-    fs.writeFile("idmap.json", JSON.stringify(idMap), function(err) {
+    fs.writeFile("idmap.json", JSON.stringify(idMap, null, 2), function(err) {
         if(err) {
             return console.log(err);
         }
